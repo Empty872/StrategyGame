@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PathNode
 {
-    public GridPosition GridPosition { get; private set; }
+    public GridPosition GridPosition => GridObject.GridPosition;
     public GridObject GridObject { get; private set; }
     public int GCost{ get; private set; }
     public int HCost{ get; private set; }
@@ -14,8 +14,7 @@ public class PathNode
 
     public PathNode(GridPosition gridPosition)
     {
-        GridObject = LevelGrid.Instance.GridSystem.GetGridObject(GridPosition);
-        GridPosition = gridPosition;
+        GridObject = LevelGrid.Instance.GridSystem.GetGridObject(gridPosition);
     }
 
     public override string ToString()

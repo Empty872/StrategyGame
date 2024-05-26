@@ -166,59 +166,6 @@ public class Pathfinding : MonoBehaviour
         if (leftNodeIsGood && downNodeIsGood) neighbourList.Add(GetNode(gridPosition.x - 1, gridPosition.z - 1));
         if (rightNodeIsGood && upNodeIsGood) neighbourList.Add(GetNode(gridPosition.x + 1, gridPosition.z + 1));
         if (rightNodeIsGood && downNodeIsGood) neighbourList.Add(GetNode(gridPosition.x + 1, gridPosition.z - 1));
-        // if (gridPosition.x > 0)
-        // {
-        //     var leftNode = GetNode(gridPosition.x - 1, gridPosition.z + 0);
-        //     if (leftNode.IsWalkable)
-        //     {
-        //         // Left
-        //         neighbourList.Add(leftNode);
-        //         if (gridPosition.z < _gridSystem.Height - 1)
-        //         {
-        //             // Left Up
-        //             var upNode = GetNode(gridPosition.x - 1, gridPosition.z + 1);
-        //             if (IsWalkableGridPosition(node.GridPosition)) ;
-        //             neighbourList.Add(node);
-        //             // neighbourList.Add(GetNode(gridPosition.x - 1, gridPosition.z + 1));
-        //         }
-        //
-        //         if (gridPosition.z > 0)
-        //         {
-        //             // Left Down
-        //             neighbourList.Add(GetNode(gridPosition.x - 1, gridPosition.z - 1));
-        //         }
-        //     }
-        // }
-        //
-        // if (gridPosition.x < _gridSystem.Width - 1)
-        // {
-        //     // Right
-        //     neighbourList.Add(GetNode(gridPosition.x + 1, gridPosition.z + 0));
-        //     if (gridPosition.z < _gridSystem.Height - 1)
-        //     {
-        //         // Right Up
-        //         neighbourList.Add(GetNode(gridPosition.x + 1, gridPosition.z + 1));
-        //     }
-        //
-        //     if (gridPosition.z > 0)
-        //     {
-        //         // Right Down
-        //         neighbourList.Add(GetNode(gridPosition.x + 1, gridPosition.z - 1));
-        //     }
-        // }
-        //
-        // if (gridPosition.z < _gridSystem.Height - 1)
-        // {
-        //     // Up
-        //     neighbourList.Add(GetNode(gridPosition.x + 0, gridPosition.z + 1));
-        // }
-        //
-        // if (gridPosition.z > 0)
-        // {
-        //     // down
-        //     neighbourList.Add(GetNode(gridPosition.x + 0, gridPosition.z - 1));
-        // }
-
         return neighbourList;
     }
 

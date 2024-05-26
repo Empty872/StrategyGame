@@ -19,12 +19,10 @@ public class ScreenShake : MonoBehaviour
 
         Instance = this;
         _cinemachineImpulseSource = GetComponent<CinemachineImpulseSource>();
-        Debug.Log(_cinemachineImpulseSource + "Awake");
     }
 
     public void Shake(float force = 1f)
     {
-        Debug.Log(_cinemachineImpulseSource + "Shake");
         _cinemachineImpulseSource.GenerateImpulse(force);
     }
 }

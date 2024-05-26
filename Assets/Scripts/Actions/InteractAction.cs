@@ -7,10 +7,6 @@ public class InteractAction : BaseAction
 {
     private int _maxInteractionDistance = 1;
 
-    protected override void Awake()
-    {
-        base.Awake();
-    }
 
 
     private void Update()

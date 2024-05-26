@@ -14,7 +14,7 @@ public class UnitActionSystem : MonoBehaviour
     public event EventHandler OnSelectedActionChanged;
     public event EventHandler<bool> OnBusyChanged;
     public event EventHandler OnActionStarted;
-    public static UnitActionSystem Instance;
+    public static UnitActionSystem Instance { get; private set; }
     private bool _isBusy;
     public BaseAction SelectedAction { get; private set; }
 

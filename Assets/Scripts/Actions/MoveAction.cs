@@ -14,10 +14,6 @@ public class MoveAction : BaseAction
     private float _stoppingDistance = 0.1f;
     private float _rotationSpeed = 10f;
 
-    protected override void Awake()
-    {
-        base.Awake();
-    }
 
 
     private void Update()

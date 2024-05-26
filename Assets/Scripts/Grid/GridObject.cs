@@ -4,7 +4,7 @@ using System.Linq;
 public class GridObject
 {
     private GridSystem<GridObject> _gridSystem;
-    private GridPosition _gridPosition;
+    public GridPosition GridPosition { get; private set; }
     private List<Unit> _units = new();
     private List<Destructible> _destructibles = new();
     private IInteractable _interactable;
@@ -13,14 +13,14 @@ public class GridObject
     public GridObject(GridSystem<GridObject> gridSystem, GridPosition gridPosition)
     {
         _gridSystem = gridSystem;
-        _gridPosition = gridPosition;
+        GridPosition = gridPosition;
     }
 
     public override string ToString()
     {
         var unitString = _units.Aggregate("", (current, unit) => current + (unit + "\n"));
 
-        return _gridPosition + "\n" + unitString;
+        return GridPosition + "\n" + unitString;
     }
 
     public void AddUnit(Unit unit)

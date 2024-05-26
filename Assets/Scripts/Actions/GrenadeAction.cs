@@ -11,7 +11,6 @@ public class GrenadeAction : BaseAction
     private int _explosionRadius = 1;
     private float _damage = 10;
     private List<GridPosition> _affectedGridPositions;
-    [SerializeField] private Transform _grenadeProjectilePrefab;
     private bool _canThrow = true;
 
     public class OnThrowEventArgs : EventArgs
@@ -21,7 +20,7 @@ public class GrenadeAction : BaseAction
         public List<GridPosition> affectedGridPositions;
         public Action<List<GridPosition>> onHitAffectAction;
     }
-
+    
     public override string GetName() => "Grenade";
 
     private int _maxThrowDistance = 6;
@@ -85,25 +84,12 @@ public class GrenadeAction : BaseAction
 
     public List<GridPosition> GetValidActionGridPositionList(GridPosition unitGridPosition)
     {
-        // var validGridPositionList = new List<GridPosition>();
-        // foreach (var gridPosition in GetReachableActionGridPositionList(unitGridPosition))
-        // {
-        //     validGridPositionList.Add(gridPosition);
-        // }
-        //
-        // return validGridPositionList;
         return GetReachableActionGridPositionList(unitGridPosition);
     }
 
     private void Throw()
     {
         var affectedGridPositionList = GetAffectedGridPositionList(TargetGridPosition);
-        // foreach (var gridPosition in affectedGridPositionList)
-        // {
-        //     AffectGridPosition(gridPosition);
-        // }
-
-        // var grenadeTransform = Instantiate(_grenadeProjectilePrefab, transform.position, Quaternion.identity);
         OnThrow?.Invoke(this,
             new OnThrowEventArgs
             {
