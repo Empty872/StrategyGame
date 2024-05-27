@@ -13,7 +13,7 @@ public class UnitWorldUI : MonoBehaviour
     private void Start()
     {
         Unit.OnAnyActionPointsChanged += Unit_OnAnyActionPointsChanged;
-        _healthSystem.OnTakeDamage += HealthSystem_OnDamaged;
+        _healthSystem.OnHealthChanged += HealthSystem_OnHealthChanged;
         UpdateActionPointsText();
         UpdateHealthBar();
     }
@@ -33,7 +33,7 @@ public class UnitWorldUI : MonoBehaviour
         _healthBarFiller.fillAmount = _healthSystem.GetHealthNormalized();
     }
 
-    private void HealthSystem_OnDamaged(object sender, EventArgs e)
+    private void HealthSystem_OnHealthChanged(object sender, EventArgs e)
     {
         UpdateHealthBar();
     }

@@ -3,14 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SwordAction : BaseAction
+public class HealAction : BaseAction
 {
-    public static event EventHandler OnAnyAttack;
-    public event EventHandler OnSwordActionStarted;
-    public event EventHandler OnSwordActionCompleted;
+    protected override int GetCooldown() => 1;
 
-    public override string GetName() => "Sword";
-    private int _maxAttackDistance = 1;
+    public int HealAmount => (int)(Unit.MagicAttack * 0.7f);
+    public override string GetName() => "Heal";
+    private int _maxActionDistance = 1;
     private float _stateTimer;
     private State _state;
     public Unit TargetUnit { get; private set; }
@@ -24,52 +23,14 @@ public class SwordAction : BaseAction
     private void Update()
     {
         if (!IsActive) return;
-        _stateTimer -= Time.deltaTime;
-        switch (_state)
-        {
-            case State.SwingingBeforeHit:
-                var rotationSpeed = 10;
-                var attackDirection = (TargetUnit.WorldPosition - transform.position).normalized;
-                transform.forward = Vector3.Lerp(transform.forward, attackDirection, rotationSpeed * Time.deltaTime);
-                break;
-            case State.SwingingAfterHit:
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-
-        if (_stateTimer <= 0)
-        {
-            NextState();
-        }
+        CompleteAction();
     }
 
-    private void NextState()
-    {
-        switch (_state)
-        {
-            case State.SwingingBeforeHit:
-                _state = State.SwingingAfterHit;
-                var afterHitStateTime = 0.5f;
-                _stateTimer = afterHitStateTime;
-                Attack();
-                break;
-            case State.SwingingAfterHit:
-                OnSwordActionCompleted?.Invoke(this, EventArgs.Empty);
-                CompleteAction();
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-    }
 
     public override void TakeAction(GridPosition gridPosition, Action actionOnComplete)
     {
         TargetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
-        _state = State.SwingingBeforeHit;
-        var beforeStateTime = 0.7f;
-        _stateTimer = beforeStateTime;
-        OnSwordActionStarted?.Invoke(this, EventArgs.Empty);
+        Heal();
         StartAction(actionOnComplete);
     }
 
@@ -84,9 +45,9 @@ public class SwordAction : BaseAction
         var reachableGridPositionList = new List<GridPosition>();
         // var unitGridPosition = Unit.GridPosition;
 
-        for (int x = -_maxAttackDistance; x <= _maxAttackDistance; x++)
+        for (int x = -_maxActionDistance; x <= _maxActionDistance; x++)
         {
-            for (int z = -_maxAttackDistance; z <= _maxAttackDistance; z++)
+            for (int z = -_maxActionDistance; z <= _maxActionDistance; z++)
             {
                 var offsetGridPosition = new GridPosition(x, z);
                 var possibleGridPosition = unitGridPosition + offsetGridPosition;
@@ -95,8 +56,6 @@ public class SwordAction : BaseAction
                     continue;
                 }
 
-                var possibleDistance = Mathf.Abs(x) + Mathf.Abs(z);
-                // if (possibleDistance > _maxAttackDistance) continue;
                 reachableGridPositionList.Add(possibleGridPosition);
             }
         }
@@ -123,7 +82,7 @@ public class SwordAction : BaseAction
 
             // Both enemies in same team
             var targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
-            if (targetUnit.IsEnemy == Unit.IsEnemy) continue;
+            if (targetUnit.IsEnemy != Unit.IsEnemy) continue;
 
             validGridPositionList.Add(gridPosition);
         }
@@ -131,20 +90,17 @@ public class SwordAction : BaseAction
         return validGridPositionList;
     }
 
-    private void Attack()
+    private void Heal()
     {
-        var finalDamage = GetFinalDamage(Unit.Attack, TargetUnit.Defense);
-        TargetUnit.TakeDamage(finalDamage);
-        OnAnyAttack?.Invoke(this, EventArgs.Empty);
+        TargetUnit.RestoreHealth(HealAmount);
     }
 
     public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
     {
-        var targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
         return new EnemyAIAction
         {
             gridPosition = gridPosition,
-            actionPriority = 1000
+            actionPriority = 0
         };
     }
 
@@ -152,9 +108,7 @@ public class SwordAction : BaseAction
     {
         return GetValidActionGridPositionList(unitGridPosition).Count;
     }
-
-    public override GridColorEnum GetColor() => GridColorEnum.Red;
-    protected override float GetModifier() => 1;
-    public override string GetDescription() => "Attack enemy in melee combat using ATK";
+    public override GridColorEnum GetColor() => GridColorEnum.Green;
+    public override string GetDescription() => "Heal one ally by " + HealAmount + " HP";
 
 }

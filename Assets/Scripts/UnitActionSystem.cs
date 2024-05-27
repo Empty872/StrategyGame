@@ -14,9 +14,10 @@ public class UnitActionSystem : MonoBehaviour
     public event EventHandler OnSelectedActionChanged;
     public event EventHandler<bool> OnBusyChanged;
     public event EventHandler OnActionStarted;
-    public static UnitActionSystem Instance { get; private set; }
+    
     private bool _isBusy;
     public BaseAction SelectedAction { get; private set; }
+    public static UnitActionSystem Instance { get; private set; }
 
     private void Awake()
     {
@@ -32,6 +33,13 @@ public class UnitActionSystem : MonoBehaviour
     private void Start()
     {
         SelectUnit(_selectedUnit);
+        TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
+    }
+
+    private void TurnSystem_OnTurnChanged(object sender, TurnSystem.OnTurnChangedEventArgs e)
+    {
+        if (e.isPlayerTurn) SelectUnit(UnitManager.Instance.FriendlyUnitList[0]);
+        else SelectUnit(UnitManager.Instance.EnemyUnitList[0], true);
     }
 
     void Update()
@@ -45,7 +53,7 @@ public class UnitActionSystem : MonoBehaviour
 
     private void HandleSelectedAction()
     {
-        if (InputManager.Instance.IsMouseButtonDownThisFrame())
+        if (InputManager.Instance.IsLeftMouseButtonDownThisFrame())
         {
             var mouseGridPosition = LevelGrid.Instance.GetGridPosition(MouseWorld.GetPosition());
             if (!SelectedAction.IsValidActionGridPosition(mouseGridPosition)) return;
@@ -58,7 +66,7 @@ public class UnitActionSystem : MonoBehaviour
 
     private bool TryHandleUnitSelection()
     {
-        if (!InputManager.Instance.IsMouseButtonDownThisFrame()) return false;
+        if (!InputManager.Instance.IsRightMouseButtonDownThisFrame()) return false;
         var ray = Camera.main.ScreenPointToRay(InputManager.Instance.GetMouseScreenPosition());
         if (Physics.Raycast(ray, out RaycastHit raycastHit, float.MaxValue, _unitLayerMask))
         {
@@ -74,10 +82,10 @@ public class UnitActionSystem : MonoBehaviour
         return false;
     }
 
-    private void SelectUnit(Unit unit)
+    public void SelectUnit(Unit unit, bool isEnemy = false)
     {
         _selectedUnit = unit;
-        SelectAction(unit.GetAction<MoveAction>());
+        if (!isEnemy) SelectAction(unit.GetAction<MoveAction>());
         OnSelectedUnitChanged?.Invoke(this, EventArgs.Empty);
     }
 

@@ -145,7 +145,8 @@ public class ShootAction : BaseAction
 
     private void Shoot()
     {
-        TargetUnit.TakeDamage(10);
+        var finalDamage = GetFinalDamage(Unit.Attack, TargetUnit.Defense);
+        TargetUnit.TakeDamage(finalDamage);
         OnShoot?.Invoke(this, new OnShootEventArgs { targetUnit = TargetUnit, shootingUnit = Unit });
         OnAnyShoot?.Invoke(this, new OnShootEventArgs { targetUnit = TargetUnit, shootingUnit = Unit });
     }
@@ -164,4 +165,7 @@ public class ShootAction : BaseAction
     {
         return GetValidActionGridPositionList(unitGridPosition).Count;
     }
+
+    public override GridColorEnum GetColor() => GridColorEnum.Red;
+    public override string GetDescription() => "Attack enemy from distance using ATK";
 }

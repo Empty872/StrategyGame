@@ -8,6 +8,7 @@ public class EnemyAI : MonoBehaviour
     // Start is called before the first frame update
     private float _timer = 2;
     private State _state;
+    public static EnemyAI Instance { get; private set; }
 
     private enum State
     {
@@ -18,6 +19,13 @@ public class EnemyAI : MonoBehaviour
 
     private void Awake()
     {
+        if (Instance is not null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
         _state = State.WaitingForEnemyTurn;
     }
 
@@ -26,9 +34,9 @@ public class EnemyAI : MonoBehaviour
         TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
     }
 
-    private void TurnSystem_OnTurnChanged(object sender, EventArgs e)
+    private void TurnSystem_OnTurnChanged(object sender, TurnSystem.OnTurnChangedEventArgs e)
     {
-        if (TurnSystem.Instance.IsPlayerTurn) return;
+        if (e.isPlayerTurn) return;
         _state = State.TakingTurn;
         _timer = 2;
     }
@@ -62,6 +70,7 @@ public class EnemyAI : MonoBehaviour
     {
         foreach (var enemyUnit in UnitManager.Instance.EnemyUnitList)
         {
+            UnitActionSystem.Instance.SelectUnit(enemyUnit, true);
             if (TryTakeEnemyAIAction(enemyUnit, onEnemyAIAActionComplete)) return true;
         }
 

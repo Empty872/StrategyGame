@@ -9,7 +9,6 @@ public class GrenadeAction : BaseAction
     public static event EventHandler<OnThrowEventArgs> OnAnyThrow;
     public event EventHandler<OnThrowEventArgs> OnThrow;
     private int _explosionRadius = 1;
-    private float _damage = 10;
     private List<GridPosition> _affectedGridPositions;
     private bool _canThrow = true;
 
@@ -122,7 +121,11 @@ public class GrenadeAction : BaseAction
     {
         var unit = LevelGrid.Instance.GetUnitAtGridPosition(targetGridPosition);
         var desctructible = LevelGrid.Instance.GetDestructibleAtGridPosition(targetGridPosition);
-        if (unit is not null) unit.TakeDamage(_damage);
+        if (unit is not null)
+        {
+            var finalDamage = GetFinalDamage(Unit.MagicAttack, unit.Defense);
+            unit.TakeDamage(finalDamage);
+        };
         if (desctructible is not null) desctructible.Destruct();
     }
 
@@ -142,7 +145,7 @@ public class GrenadeAction : BaseAction
         return new EnemyAIAction
         {
             gridPosition = gridPosition,
-            actionPriority = 0
+            actionPriority = -1
         };
     }
 
@@ -154,4 +157,9 @@ public class GrenadeAction : BaseAction
     {
         return GetValidActionGridPositionList(unitGridPosition).Count;
     }
+
+    protected override int GetCooldown() => 2;
+    public override GridColorEnum GetColor() => GridColorEnum.Red;
+    protected override float GetModifier() => 0.6f;
+    public override string GetDescription() => "Deal MAG damage to all units in range";
 }

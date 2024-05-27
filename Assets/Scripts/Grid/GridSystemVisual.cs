@@ -10,6 +10,7 @@ public class GridSystemVisual : MonoBehaviour
     private GridSystemVisualSingle[,] _gridSystemVisualSingleArray;
     public static GridSystemVisual Instance { get; private set; }
     private List<GridPosition> _mouseGridPositionList = new();
+    private TurnSystem _turnSystem;
 
     private void Awake()
     {
@@ -24,7 +25,6 @@ public class GridSystemVisual : MonoBehaviour
 
     private void Start()
     {
-
         _gridSystemVisualSingleArray = new GridSystemVisualSingle[LevelGrid.Instance.Width, LevelGrid.Instance.Height];
         for (var x = 0; x < LevelGrid.Instance.Width; x++)
         {
@@ -37,23 +37,26 @@ public class GridSystemVisual : MonoBehaviour
             }
         }
 
-        LevelGrid.Instance.OnAnyUnitMovedGridPosition += LevelGrid_OnAnyUnitMovedGridPosition;
+        _turnSystem = TurnSystem.Instance;
         UnitActionSystem.Instance.OnSelectedActionChanged += UnitActionSystem_OnSelectedActionChanged;
         UnitActionSystem.Instance.OnBusyChanged += UnitActionSystem_OnBusyChanged;
+        _turnSystem.OnTurnChanged += TurnSystem_OnTurnChanged;
         UpdateGridVisual();
     }
 
-    private void UnitActionSystem_OnBusyChanged(object sender, bool e)
+    private void TurnSystem_OnTurnChanged(object sender, TurnSystem.OnTurnChangedEventArgs e)
     {
-        UpdateGridVisual();
+        if (e.isPlayerTurn) UpdateGridVisual();
+        else HideAllGridPositions();
+    }
+
+    private void UnitActionSystem_OnBusyChanged(object sender, bool isBusy)
+    {
+        if (isBusy) HideAllGridPositions();
+        else UpdateGridVisual();
     }
 
     private void UnitActionSystem_OnSelectedActionChanged(object sender, EventArgs e)
-    {
-        UpdateGridVisual();
-    }
-
-    private void LevelGrid_OnAnyUnitMovedGridPosition(object sender, EventArgs e)
     {
         UpdateGridVisual();
     }
@@ -85,10 +88,11 @@ public class GridSystemVisual : MonoBehaviour
             ShowPossibleGridPosition(gridPosition);
         }
     }
+
     public void ShowPossibleGridPosition(GridPosition gridPosition)
     {
         _gridSystemVisualSingleArray[gridPosition.x, gridPosition.z]
-                .Show(GetPossibleGridMaterial());
+            .Show(GetPossibleGridMaterial());
     }
 
     public void HideAllGridPositions()
@@ -117,6 +121,7 @@ public class GridSystemVisual : MonoBehaviour
 
     public void UpdateMouseGridVisual()
     {
+        if (!_turnSystem.IsPlayerTurn) return;
         if (EventSystem.current.IsPointerOverGameObject()) return;
         var mouseGridPosition = LevelGrid.Instance.GetGridPosition(MouseWorld.GetPosition());
         var selectedAction = UnitActionSystem.Instance.SelectedAction;

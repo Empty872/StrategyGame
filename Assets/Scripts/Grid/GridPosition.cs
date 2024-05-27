@@ -42,4 +42,10 @@ public struct GridPosition : IEquatable<GridPosition>
     {
         return new GridPosition(a.x - b.x, a.z - b.z);
     }
+
+    public static int GetDistance(GridPosition a, GridPosition b)
+    {
+        var gridPosition = a - b;
+        return Math.Abs(gridPosition.x) + Math.Abs(gridPosition.z);
+    }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class Unit : MonoBehaviour
 {
@@ -10,11 +11,22 @@ public class Unit : MonoBehaviour
     public BaseAction[] ActionArray { get; private set; }
     [SerializeField] private bool _isEnemy;
     public bool IsEnemy => _isEnemy;
-    private int _maxActionPoints = 10;
+    public int MaxActionPoints => _unitCharacteristic.MaxActionPoints;
+    public int MaxMovementPoints => _unitCharacteristic.Speed;
+
     public int ActionPoints { get; private set; }
+    public int MovementPoints { get; private set; }
+
+    // public int ActionPoints { get; private set; }
     public static event EventHandler OnAnyActionPointsChanged;
     public static event EventHandler<UnitGridPositionEventArgs> OnAnyUnitDied;
     public static event EventHandler OnAnyUnitSpawned;
+    public int Attack => _unitCharacteristic.Attack;
+    public int Defense => _unitCharacteristic.Defense;
+    public int MagicAttack => _unitCharacteristic.MagicAttack;
+    public int Speed => _unitCharacteristic.Speed;
+    public int Health => _healthSystem.Health;
+    public int MaxHealth => _healthSystem.MaxHealth;
 
     public class UnitGridPositionEventArgs : EventArgs
     {
@@ -23,34 +35,36 @@ public class Unit : MonoBehaviour
 
     private HealthSystem _healthSystem;
 
+    private UnitCharacteristic _unitCharacteristic;
     // Update is called once per frame
 
     private void Awake()
     {
         ActionArray = GetComponents<BaseAction>();
         _healthSystem = GetComponent<HealthSystem>();
+        _unitCharacteristic = GetComponent<UnitCharacteristic>();
     }
 
     private void Start()
     {
-        ResetActionPoints();
+        ResetPoints();
         GridPosition = LevelGrid.Instance.GetGridPosition(transform.position);
         LevelGrid.Instance.AddUnitAtGridPosition(GridPosition, this);
         TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
-        _healthSystem.OnDeath += HealthSystemOnDeath;
+        _healthSystem.OnDeath += HealthSystem_OnDeath;
         OnAnyUnitSpawned?.Invoke(this, EventArgs.Empty);
     }
 
-    private void HealthSystemOnDeath(object sender, EventArgs e)
+    private void HealthSystem_OnDeath(object sender, EventArgs e)
     {
         Die();
     }
 
-    private void TurnSystem_OnTurnChanged(object sender, EventArgs e)
+    private void TurnSystem_OnTurnChanged(object sender, TurnSystem.OnTurnChangedEventArgs e)
     {
-        if ((IsEnemy && !TurnSystem.Instance.IsPlayerTurn) || (!IsEnemy && TurnSystem.Instance.IsPlayerTurn))
+        if ((IsEnemy && !e.isPlayerTurn) || (!IsEnemy && e.isPlayerTurn))
         {
-            ResetActionPoints();
+            ResetPoints();
         }
     }
 
@@ -67,7 +81,7 @@ public class Unit : MonoBehaviour
 
     public bool CanSpendActionPointsToTakeAction(BaseAction action)
     {
-        return action.GetCost() <= ActionPoints;
+        return action.GetActionPointsCost() <= ActionPoints;
     }
 
     private void SpendActionPoints(int amount)
@@ -79,19 +93,35 @@ public class Unit : MonoBehaviour
     public bool TrySpendActionPointsToTakeAction(BaseAction action)
     {
         if (!CanSpendActionPointsToTakeAction(action)) return false;
-        SpendActionPoints(action.GetCost());
+        SpendActionPoints(action.GetActionPointsCost());
         return true;
     }
 
-    private void ResetActionPoints()
+    public bool CanSpendMovementPoints(int count)
     {
-        ActionPoints = _maxActionPoints;
+        return MovementPoints <= count;
+    }
+
+    public void SpendMovementPoints(int count)
+    {
+        MovementPoints -= count;
+    }
+
+    private void ResetPoints()
+    {
+        ActionPoints = MaxActionPoints;
+        MovementPoints = MaxMovementPoints;
         OnAnyActionPointsChanged?.Invoke(this, EventArgs.Empty);
     }
 
-    public void TakeDamage(float damage)
+    public void TakeDamage(int damage)
     {
         _healthSystem.TakeDamage(damage);
+    }
+
+    public void RestoreHealth(int count)
+    {
+        _healthSystem.RestoreHealth(count);
     }
 
     private void Die()
@@ -111,5 +141,14 @@ public class Unit : MonoBehaviour
         }
 
         return null;
+    }
+
+    public void ChangeDefense(int amount)
+    {
+        _unitCharacteristic.ChangeDefense(amount);
+    }
+    public void ChangeAttack(int amount)
+    {
+        _unitCharacteristic.ChangeAttack(amount);
     }
 }

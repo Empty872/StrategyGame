@@ -35,10 +35,14 @@ public class SpinAction : BaseAction
         return GetReachableActionGridPositionList();
     }
 
-    public override int GetCost() => 2;
+    public override int GetActionPointsCost() => 2;
 
     public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
     {
         return new EnemyAIAction { gridPosition = gridPosition, actionPriority = 0 };
     }
+    public override GridColorEnum GetColor() => GridColorEnum.Green;
+    public override string GetDescription() => "Spin";
+
+
 }

@@ -7,13 +7,12 @@ public class MoveAction : BaseAction
 {
     public event EventHandler OnStartMoving;
     public event EventHandler OnStopMoving;
-    private int _maxMovementDistance = 4;
+    private int _maxMovementDistance => Unit.MovementPoints;
     private List<Vector3> _targetPositionList;
     private int _currentPositionIndex;
     private float _speed = 5;
     private float _stoppingDistance = 0.1f;
     private float _rotationSpeed = 10f;
-
 
 
     private void Update()
@@ -49,6 +48,8 @@ public class MoveAction : BaseAction
         {
             _targetPositionList.Add(LevelGrid.Instance.GetWorldPosition(pathGridPosition));
         }
+
+        Unit.SpendMovementPoints(GridPosition.GetDistance(targetGridPosition, Unit.GridPosition));
     }
 
     public override List<GridPosition> GetReachableActionGridPositionList()
@@ -106,10 +107,15 @@ public class MoveAction : BaseAction
     }
 
     public override string GetName() => "Move";
+    public override int GetActionPointsCost() => 0;
 
     public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
     {
-        int targetCountAtGridPosition = Unit.GetAction<ShootAction>().GetTargetCountAtPosition(gridPosition);
-        return new EnemyAIAction { gridPosition = gridPosition, actionPriority = targetCountAtGridPosition * 10 };
+        // int targetCountAtGridPosition = Unit.GetAction<ShootAction>().GetTargetCountAtPosition(gridPosition);
+        return new EnemyAIAction { gridPosition = gridPosition, actionPriority = 10 };
     }
+    public override GridColorEnum GetColor() => GridColorEnum.Blue;
+    public override string GetDescription() => "Move unit";
+
+
 }

@@ -66,4 +66,8 @@ public class InteractAction : BaseAction
     {
         return new EnemyAIAction { gridPosition = gridPosition, actionPriority = 0 };
     }
+    public override GridColorEnum GetColor() => GridColorEnum.Yellow;
+    public override int GetActionPointsCost() => 0;
+    public override string GetDescription() => "Interact with object";
+
 }
