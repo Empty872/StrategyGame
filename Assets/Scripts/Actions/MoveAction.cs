@@ -41,14 +41,16 @@ public class MoveAction : BaseAction
     {
         var pathGridPositionList =
             Pathfinding.Instance.FindPath(Unit.GridPosition, targetGridPosition, out int pathLength);
+        
         _currentPositionIndex = 0;
         _targetPositionList = new List<Vector3>();
-        StartAction(actionOnComplete);
+        
         foreach (var pathGridPosition in pathGridPositionList)
         {
             _targetPositionList.Add(LevelGrid.Instance.GetWorldPosition(pathGridPosition));
         }
-
+        StartAction(actionOnComplete);
+        Debug.Log(_targetPositionList.Count);
         Unit.SpendMovementPoints(GridPosition.GetDistance(targetGridPosition, Unit.GridPosition));
     }
 
@@ -114,8 +116,7 @@ public class MoveAction : BaseAction
         // int targetCountAtGridPosition = Unit.GetAction<ShootAction>().GetTargetCountAtPosition(gridPosition);
         return new EnemyAIAction { gridPosition = gridPosition, actionPriority = 10 };
     }
+
     public override GridColorEnum GetColor() => GridColorEnum.Blue;
     public override string GetDescription() => "Move unit";
-
-
 }

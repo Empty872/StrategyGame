@@ -51,7 +51,7 @@ public class FortifyAction : BaseAction
     }
 
     public override GridColorEnum GetColor() => GridColorEnum.Green;
-    public override string GetDescription() => "Increases DEF by " + _extraDefense;
+    public override string GetDescription() => "Increases DEF by " + _extraDefense + " for " + _effectDuration + " turns";
 
-    protected override int GetCooldown() => 3;
+    public override int GetCooldown() => 3;
 }

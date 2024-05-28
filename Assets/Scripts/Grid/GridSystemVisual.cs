@@ -115,18 +115,19 @@ public class GridSystemVisual : MonoBehaviour
     {
         HideAllGridPositions();
         var selectedAction = UnitActionSystem.Instance.SelectedAction;
-
+        if (selectedAction is null) return;
         ShowReachableGridPositions(selectedAction.GetReachableActionGridPositionList());
     }
 
     public void UpdateMouseGridVisual()
     {
         if (!_turnSystem.IsPlayerTurn) return;
+        if (UnitActionSystem.Instance.IsBusy) return;
         if (EventSystem.current.IsPointerOverGameObject()) return;
         var mouseGridPosition = LevelGrid.Instance.GetGridPosition(MouseWorld.GetPosition());
         var selectedAction = UnitActionSystem.Instance.SelectedAction;
         var mouseGridPositionList = new List<GridPosition>();
-        if (LevelGrid.Instance.IsValidGridPosition(mouseGridPosition))
+        if (selectedAction is not null && LevelGrid.Instance.IsValidGridPosition(mouseGridPosition))
             mouseGridPositionList = selectedAction.GetAffectedGridPositionList(mouseGridPosition);
 
         foreach (var gridPosition in _mouseGridPositionList)

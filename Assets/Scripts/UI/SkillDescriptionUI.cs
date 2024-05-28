@@ -7,6 +7,8 @@ using UnityEngine;
 public class SkillDescriptionUI : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI _descriptionText;
+    [SerializeField] private TextMeshProUGUI _actionPointsText;
+    [SerializeField] private TextMeshProUGUI _cooldownText;
 
     public static SkillDescriptionUI Instance { get; private set; }
 
@@ -21,9 +23,16 @@ public class SkillDescriptionUI : MonoBehaviour
         Instance = this;
     }
 
+    private void Start()
+    {
+        Hide();
+    }
+
     private void UpdateDescription(BaseAction action)
     {
         _descriptionText.text = action.GetDescription();
+        _actionPointsText.text = "AP: " + action.GetActionPointsCost();
+        _cooldownText.text = "CD: " + action.GetCooldown();
     }
 
     public void Hide()

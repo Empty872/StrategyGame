@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class BattleCryAction : BaseAction
 {
-    protected override int GetCooldown() => 4;
+    public override int GetCooldown() => 4;
     private int _extraAttack = 10;
     private int _effectDuration = 2;
     public override string GetName() => "Battle Cry";
@@ -94,7 +94,9 @@ public class BattleCryAction : BaseAction
     }
 
     public override GridColorEnum GetColor() => GridColorEnum.Green;
-    public override string GetDescription() => "Increases allies' ATK by " + _extraAttack;
+
+    public override string GetDescription() =>
+        "Increases allies' ATK by " + _extraAttack + " for " + _effectDuration + " turns";
 
     public override List<GridPosition> GetAffectedGridPositionList(GridPosition targetGridPosition)
     {

@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class HealAction : BaseAction
 {
-    protected override int GetCooldown() => 1;
+    public override int GetCooldown() => 1;
 
     public int HealAmount => (int)(Unit.MagicAttack * 0.7f);
     public override string GetName() => "Heal";

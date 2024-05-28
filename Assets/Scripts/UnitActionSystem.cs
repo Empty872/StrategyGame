@@ -14,8 +14,9 @@ public class UnitActionSystem : MonoBehaviour
     public event EventHandler OnSelectedActionChanged;
     public event EventHandler<bool> OnBusyChanged;
     public event EventHandler OnActionStarted;
-    
+
     private bool _isBusy;
+    public bool IsBusy => _isBusy;
     public BaseAction SelectedAction { get; private set; }
     public static UnitActionSystem Instance { get; private set; }
 
@@ -55,6 +56,7 @@ public class UnitActionSystem : MonoBehaviour
     {
         if (InputManager.Instance.IsLeftMouseButtonDownThisFrame())
         {
+            if (SelectedAction is null) return;
             var mouseGridPosition = LevelGrid.Instance.GetGridPosition(MouseWorld.GetPosition());
             if (!SelectedAction.IsValidActionGridPosition(mouseGridPosition)) return;
             if (!_selectedUnit.TrySpendActionPointsToTakeAction(SelectedAction)) return;

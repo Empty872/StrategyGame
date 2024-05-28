@@ -158,7 +158,7 @@ public class GrenadeAction : BaseAction
         return GetValidActionGridPositionList(unitGridPosition).Count;
     }
 
-    protected override int GetCooldown() => 2;
+    public override int GetCooldown() => 2;
     public override GridColorEnum GetColor() => GridColorEnum.Red;
     protected override float GetModifier() => 0.6f;
     public override string GetDescription() => "Deal MAG damage to all units in range";

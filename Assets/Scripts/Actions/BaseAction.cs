@@ -7,6 +7,7 @@ using UnityEngine;
 public abstract class BaseAction : MonoBehaviour
 {
     public static event EventHandler OnAnyActionStarted;
+    public event EventHandler OnActionStarted;
     public static event EventHandler OnAnyActionCompleted;
     public Unit Unit { get; private set; }
     protected bool IsActive { get; private set; }
@@ -14,6 +15,7 @@ public abstract class BaseAction : MonoBehaviour
     protected Action OnActionComplete { get; private set; }
     private int _cooldown;
     private int _currentCooldown;
+    public int CurrentCooldown => _currentCooldown;
 
     protected virtual void Awake()
     {
@@ -35,14 +37,16 @@ public abstract class BaseAction : MonoBehaviour
         if (!CanBeUsed()) return;
         IsActive = true;
         OnActionComplete = action;
+        ActivateCooldown();
         OnAnyActionStarted?.Invoke(this, EventArgs.Empty);
+        OnActionStarted?.Invoke(this, EventArgs.Empty);
     }
 
     protected void CompleteAction()
     {
         IsActive = false;
         OnActionComplete();
-        ActivateCooldown();
+        TryUnselectAction();
         OnAnyActionCompleted?.Invoke(this, EventArgs.Empty);
     }
 
@@ -96,17 +100,22 @@ public abstract class BaseAction : MonoBehaviour
         _currentCooldown = GetCooldown();
     }
 
-    private bool CanBeUsed() => _currentCooldown <= 0;
+    public bool CanBeUsed() => _currentCooldown <= 0;
 
-    protected virtual int GetCooldown() => 0;
+    public virtual int GetCooldown() => 0;
     public abstract GridColorEnum GetColor();
     protected virtual float GetModifier() => 1;
 
     protected int GetFinalDamage(int attack, int enemyDefense)
     {
-        var baseDamage = Mathf.Max(attack - enemyDefense, 1);
-        var finalDamage = (int)(baseDamage * GetModifier());
+        var baseDamage = attack - enemyDefense;
+        var finalDamage = Mathf.Max((int)(baseDamage * GetModifier()), 1);
         return finalDamage;
+    }
+
+    private void TryUnselectAction()
+    {
+        if (!CanBeUsed()) UnitActionSystem.Instance.SelectAction(null);
     }
 
     public abstract string GetDescription();

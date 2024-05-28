@@ -21,6 +21,8 @@ public class SelectedUnitUI : MonoBehaviour
         _unitActionSystem.OnSelectedUnitChanged += UnitActionSystem_OnSelectedUnitChanged;
         UnitCharacteristic.OnAnyUnitCharacteristicChanged += UnitCharacteristic_OnAnyUnitCharacteristicChanged;
         HealthSystem.OnAnyHealthChanged += HealthSystem_OnAnyHealthChanged;
+        UpdateHealth();
+        UpdateCharacteristic();
     }
 
     private void HealthSystem_OnAnyHealthChanged(object sender, EventArgs e)

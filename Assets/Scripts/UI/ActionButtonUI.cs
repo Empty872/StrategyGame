@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -8,6 +9,8 @@ using UnityEngine.UI;
 public class ActionButtonUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     [SerializeField] private TextMeshProUGUI _name;
+    [SerializeField] private GameObject _blockPanel;
+    [SerializeField] private TextMeshProUGUI _currentCooldownText;
     private Button _button;
     [SerializeField] private GameObject _selectedGO;
     private BaseAction _action;
@@ -24,12 +27,19 @@ public class ActionButtonUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     {
         _action = action;
         _name.text = action.GetName();
-        _button.onClick.AddListener(() => { UnitActionSystem.Instance.SelectAction(action); });
+        _button.onClick.AddListener(TrySelect);
+        _action.OnActionStarted += Action_OnActionStarted;
+    }
+
+    private void Action_OnActionStarted(object sender, EventArgs e)
+    {
+        UpdateVisual();
     }
 
     public void UpdateVisual()
     {
-        _selectedGO.SetActive(_action == UnitActionSystem.Instance.SelectedAction);
+        if (!_action.CanBeUsed()) ShowBlockPanel();
+        _selectedGO.SetActive(_action == UnitActionSystem.Instance.SelectedAction && _action.CanBeUsed());
     }
 
     public void OnPointerEnter(PointerEventData eventData)
@@ -38,19 +48,21 @@ public class ActionButtonUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         SkillDescriptionUI.Instance.Show(_action);
     }
 
+    public void ShowBlockPanel()
+    {
+        _blockPanel.SetActive(true);
+        _currentCooldownText.text = _action.CurrentCooldown.ToString();
+    }
+
     public void OnPointerExit(PointerEventData eventData)
     {
         _isPointerInside = false;
-        // Start a coroutine to delay the hiding in case the pointer enters another child element immediately
-        StartCoroutine(CheckPointerExit());
+        SkillDescriptionUI.Instance.Hide();
     }
 
-    private IEnumerator CheckPointerExit()
+    private void TrySelect()
     {
-        yield return new WaitForEndOfFrame();
-        if (!_isPointerInside)
-        {
-            SkillDescriptionUI.Instance.Hide();
-        }
+        if (!_action.CanBeUsed()) return;
+        UnitActionSystem.Instance.SelectAction(_action);
     }
 }
