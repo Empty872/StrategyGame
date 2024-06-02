@@ -53,8 +53,11 @@ public class EnemyAI : MonoBehaviour
                 _timer -= Time.deltaTime;
                 if (_timer <= 0)
                 {
-                    _state = State.Busy;
-                    if (TryTakeEnemyAIAction(SetStateTakingTurn)) _state = State.Busy;
+                    // _state = State.Busy;
+                    if (TryTakeEnemyAIAction(SetStateTakingTurnDelayed))
+                    {
+                        _state = State.Busy;
+                    }
                     else TurnSystem.Instance.NextTurn();
                 }
 
@@ -66,22 +69,21 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
-    private bool TryTakeEnemyAIAction(Action onEnemyAIAActionComplete)
+    private bool TryTakeEnemyAIAction(Action onEnemyAIActionComplete)
     {
         foreach (var enemyUnit in UnitManager.Instance.EnemyUnitList)
         {
             UnitActionSystem.Instance.SelectUnit(enemyUnit, true);
-            if (TryTakeEnemyAIAction(enemyUnit, onEnemyAIAActionComplete)) return true;
+            if (TryTakeEnemyAIAction(enemyUnit, onEnemyAIActionComplete)) return true;
         }
 
         return false;
     }
 
-    private bool TryTakeEnemyAIAction(Unit enemyUnit, Action onEnemyAIAActionComplete)
+    private bool TryTakeEnemyAIAction(Unit enemyUnit, Action onEnemyAIActionComplete)
     {
         EnemyAIAction bestEnemyAIAction = null;
         BaseAction bestAction = null;
-        ;
         foreach (var action in enemyUnit.ActionArray)
         {
             if (!enemyUnit.CanSpendActionPointsToTakeAction(action)) continue;
@@ -96,7 +98,7 @@ public class EnemyAI : MonoBehaviour
                 if (possibleEnemyAIAction is not null &&
                     possibleEnemyAIAction.actionPriority > bestEnemyAIAction.actionPriority)
                 {
-                    bestEnemyAIAction =possibleEnemyAIAction;
+                    bestEnemyAIAction = possibleEnemyAIAction;
                     bestAction = action;
                 }
             }
@@ -104,7 +106,8 @@ public class EnemyAI : MonoBehaviour
 
         if (bestEnemyAIAction is not null && enemyUnit.TrySpendActionPointsToTakeAction(bestAction))
         {
-            bestAction.TakeAction(bestEnemyAIAction.gridPosition, onEnemyAIAActionComplete);
+            bestAction.TakeAction(bestEnemyAIAction.gridPosition, onEnemyAIActionComplete);
+
             return true;
         }
 
@@ -115,5 +118,10 @@ public class EnemyAI : MonoBehaviour
     {
         _timer = 0.5f;
         _state = State.TakingTurn;
+    }
+
+    private void SetStateTakingTurnDelayed()
+    {
+        Invoke(nameof(SetStateTakingTurn), 0.5f);
     }
 }

@@ -6,32 +6,28 @@ using UnityEngine;
 public class FortifyAction : BaseAction
 {
     public override string GetName() => "Fortify";
+    protected override int GetActionRange() => 0;
+    protected override bool CanBeUsedOnAllies() => true;
+    protected override bool CanBeUsedOnOneself() => true;
+    protected override bool CanBeUsedOnEnemies() => false;
+    protected override ActionRangeType GetActionRangeType() => ActionRangeType.Square;
+
     private int _maxDistance = 0;
     private int _extraDefense = 20;
     private int _effectDuration = 2;
+    
 
-    private void Update()
+    protected override void AffectGridPosition(GridPosition gridPosition)
     {
-        if (!IsActive) return;
-        CompleteAction();
+        RiseDefense();
     }
+    
 
     public override void TakeAction(GridPosition gridPosition, Action actionOnComplete)
     {
-        RiseDefense();
         StartAction(actionOnComplete);
-    }
-
-    public override List<GridPosition> GetReachableActionGridPositionList()
-    {
-        var unitGridPosition = Unit.GridPosition;
-        return new List<GridPosition> { unitGridPosition };
-    }
-
-
-    public override List<GridPosition> GetValidActionGridPositionList()
-    {
-        return GetReachableActionGridPositionList();
+        PerformAction(Unit.GridPosition);
+        CompleteAction();
     }
 
 

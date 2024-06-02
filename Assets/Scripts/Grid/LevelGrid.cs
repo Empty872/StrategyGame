@@ -85,7 +85,7 @@ public class LevelGrid : MonoBehaviour
     public bool IsPossibleGridPosition(GridPosition gridPosition, BaseAction action)
     {
         if (!_gridSystem.IsValidGridPosition(gridPosition)) return false;
-        foreach (var actionGridPosition in action.GetValidActionGridPositionList())
+        foreach (var actionGridPosition in action.GetPossibleActionGridPositionList())
         {
             if (gridPosition == actionGridPosition) return true;
         }

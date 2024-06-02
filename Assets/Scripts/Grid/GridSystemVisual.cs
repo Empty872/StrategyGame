@@ -10,7 +10,6 @@ public class GridSystemVisual : MonoBehaviour
     private GridSystemVisualSingle[,] _gridSystemVisualSingleArray;
     public static GridSystemVisual Instance { get; private set; }
     private List<GridPosition> _mouseGridPositionList = new();
-    private TurnSystem _turnSystem;
 
     private void Awake()
     {
@@ -37,26 +36,29 @@ public class GridSystemVisual : MonoBehaviour
             }
         }
 
-        _turnSystem = TurnSystem.Instance;
+        LevelGrid.Instance.OnAnyUnitMovedGridPosition += LevelGrid_OnAnyUnitMovedGridPosition;
         UnitActionSystem.Instance.OnSelectedActionChanged += UnitActionSystem_OnSelectedActionChanged;
         UnitActionSystem.Instance.OnBusyChanged += UnitActionSystem_OnBusyChanged;
-        _turnSystem.OnTurnChanged += TurnSystem_OnTurnChanged;
+        TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
         UpdateGridVisual();
     }
 
     private void TurnSystem_OnTurnChanged(object sender, TurnSystem.OnTurnChangedEventArgs e)
     {
-        if (e.isPlayerTurn) UpdateGridVisual();
-        else HideAllGridPositions();
+        UpdateGridVisual();
     }
 
-    private void UnitActionSystem_OnBusyChanged(object sender, bool isBusy)
+    private void UnitActionSystem_OnBusyChanged(object sender, bool e)
     {
-        if (isBusy) HideAllGridPositions();
-        else UpdateGridVisual();
+        UpdateGridVisual();
     }
 
     private void UnitActionSystem_OnSelectedActionChanged(object sender, EventArgs e)
+    {
+        UpdateGridVisual();
+    }
+
+    private void LevelGrid_OnAnyUnitMovedGridPosition(object sender, EventArgs e)
     {
         UpdateGridVisual();
     }
@@ -114,20 +116,21 @@ public class GridSystemVisual : MonoBehaviour
     public void UpdateGridVisual()
     {
         HideAllGridPositions();
+        if (UnitActionSystem.Instance.IsBusy) return;
+        if (!TurnSystem.Instance.IsPlayerTurn) return;
         var selectedAction = UnitActionSystem.Instance.SelectedAction;
-        if (selectedAction is null) return;
-        ShowReachableGridPositions(selectedAction.GetReachableActionGridPositionList());
+        if (selectedAction is not null) ShowReachableGridPositions(selectedAction.GetReachableActionGridPositionList());
     }
 
     public void UpdateMouseGridVisual()
     {
-        if (!_turnSystem.IsPlayerTurn) return;
-        if (UnitActionSystem.Instance.IsBusy) return;
         if (EventSystem.current.IsPointerOverGameObject()) return;
+        if (UnitActionSystem.Instance.IsBusy) return;
+        if (!TurnSystem.Instance.IsPlayerTurn) return;
         var mouseGridPosition = LevelGrid.Instance.GetGridPosition(MouseWorld.GetPosition());
         var selectedAction = UnitActionSystem.Instance.SelectedAction;
         var mouseGridPositionList = new List<GridPosition>();
-        if (selectedAction is not null && LevelGrid.Instance.IsValidGridPosition(mouseGridPosition))
+        if (LevelGrid.Instance.IsValidGridPosition(mouseGridPosition) && selectedAction is not null)
             mouseGridPositionList = selectedAction.GetAffectedGridPositionList(mouseGridPosition);
 
         foreach (var gridPosition in _mouseGridPositionList)

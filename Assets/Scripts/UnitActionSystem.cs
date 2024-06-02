@@ -14,11 +14,9 @@ public class UnitActionSystem : MonoBehaviour
     public event EventHandler OnSelectedActionChanged;
     public event EventHandler<bool> OnBusyChanged;
     public event EventHandler OnActionStarted;
-
-    private bool _isBusy;
-    public bool IsBusy => _isBusy;
-    public BaseAction SelectedAction { get; private set; }
     public static UnitActionSystem Instance { get; private set; }
+    public bool IsBusy { get; private set; }
+    public BaseAction SelectedAction { get; private set; }
 
     private void Awake()
     {
@@ -39,13 +37,13 @@ public class UnitActionSystem : MonoBehaviour
 
     private void TurnSystem_OnTurnChanged(object sender, TurnSystem.OnTurnChangedEventArgs e)
     {
-        if (e.isPlayerTurn) SelectUnit(UnitManager.Instance.FriendlyUnitList[0]);
-        else SelectUnit(UnitManager.Instance.EnemyUnitList[0], true);
+        if (!e.isPlayerTurn) return;
+        SelectUnit(UnitManager.Instance.FriendlyUnitList[0]);
     }
 
     void Update()
     {
-        if (_isBusy) return;
+        if (IsBusy) return;
         if (!TurnSystem.Instance.IsPlayerTurn) return;
         if (EventSystem.current.IsPointerOverGameObject()) return;
         if (TryHandleUnitSelection()) return;
@@ -56,7 +54,6 @@ public class UnitActionSystem : MonoBehaviour
     {
         if (InputManager.Instance.IsLeftMouseButtonDownThisFrame())
         {
-            if (SelectedAction is null) return;
             var mouseGridPosition = LevelGrid.Instance.GetGridPosition(MouseWorld.GetPosition());
             if (!SelectedAction.IsValidActionGridPosition(mouseGridPosition)) return;
             if (!_selectedUnit.TrySpendActionPointsToTakeAction(SelectedAction)) return;
@@ -84,23 +81,23 @@ public class UnitActionSystem : MonoBehaviour
         return false;
     }
 
-    public void SelectUnit(Unit unit, bool isEnemy = false)
+    public void SelectUnit(Unit unit, bool isEnemyTurn = false)
     {
         _selectedUnit = unit;
-        if (!isEnemy) SelectAction(unit.GetAction<MoveAction>());
+        SelectAction(unit.GetAction<MoveAction>());
         OnSelectedUnitChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private void SetBusy()
     {
-        _isBusy = true;
-        OnBusyChanged?.Invoke(this, _isBusy);
+        IsBusy = true;
+        OnBusyChanged?.Invoke(this, IsBusy);
     }
 
     private void ClearBusy()
     {
-        _isBusy = false;
-        OnBusyChanged?.Invoke(this, _isBusy);
+        IsBusy = false;
+        OnBusyChanged?.Invoke(this, IsBusy);
     }
 
     public void SelectAction(BaseAction action)

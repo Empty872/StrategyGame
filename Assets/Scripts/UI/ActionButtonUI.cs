@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -8,15 +7,14 @@ using UnityEngine.UI;
 
 public class ActionButtonUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
+    // Start is called before the first frame update
     [SerializeField] private TextMeshProUGUI _name;
     [SerializeField] private GameObject _blockPanel;
     [SerializeField] private TextMeshProUGUI _currentCooldownText;
+    
     private Button _button;
     [SerializeField] private GameObject _selectedGO;
     private BaseAction _action;
-    private bool _isPointerInside = false;
-    public BaseAction Action => _action;
-
 
     void Awake()
     {
@@ -25,26 +23,23 @@ public class ActionButtonUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     public void SetAction(BaseAction action)
     {
+        if (!TurnSystem.Instance.IsPlayerTurn) return;
         _action = action;
         _name.text = action.GetName();
-        _button.onClick.AddListener(TrySelect);
-        _action.OnActionStarted += Action_OnActionStarted;
+        _button.onClick.AddListener(() => { UnitActionSystem.Instance.SelectAction(action); });
     }
+    
 
-    private void Action_OnActionStarted(object sender, EventArgs e)
-    {
-        UpdateVisual();
-    }
 
     public void UpdateVisual()
     {
         if (!_action.CanBeUsed()) ShowBlockPanel();
-        _selectedGO.SetActive(_action == UnitActionSystem.Instance.SelectedAction && _action.CanBeUsed());
+        _selectedGO.SetActive(_action == UnitActionSystem.Instance.SelectedAction);
+        _button.onClick.AddListener(TrySelect);
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        _isPointerInside = true;
         SkillDescriptionUI.Instance.Show(_action);
     }
 
@@ -56,7 +51,6 @@ public class ActionButtonUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        _isPointerInside = false;
         SkillDescriptionUI.Instance.Hide();
     }
 

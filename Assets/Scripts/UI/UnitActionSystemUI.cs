@@ -21,7 +21,7 @@ public class UnitActionSystemUI : MonoBehaviour
         // TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
         Unit.OnAnyActionPointsChanged += Unit_OnAnyActionPointsChanged;
         CreateUnitActionButtons();
-        UpdateSelectedVisual();
+        UpdateVisual();
         UpdateActionPoints();
     }
 
@@ -32,14 +32,15 @@ public class UnitActionSystemUI : MonoBehaviour
 
     private void UnitActionSystem_OnSelectedUnitChanged(object sender, EventArgs e)
     {
+        if (UnitActionSystem.Instance.SelectedUnit.IsEnemy) return;
         CreateUnitActionButtons();
-        UpdateSelectedVisual();
+        UpdateVisual();
         UpdateActionPoints();
     }
 
     private void UnitActionSystem_OnSelectedActionChanged(object sender, EventArgs e)
     {
-        UpdateSelectedVisual();
+        UpdateVisual();
     }
 
     private void CreateUnitActionButtons()
@@ -59,11 +60,9 @@ public class UnitActionSystemUI : MonoBehaviour
             actionButtonUI.SetAction(action);
             _actionButtonUIList.Add(actionButtonUI);
         }
-
-        UpdateSelectedVisual();
     }
 
-    private void UpdateSelectedVisual()
+    private void UpdateVisual()
     {
         foreach (var actionButtonUI in _actionButtonUIList)
         {
