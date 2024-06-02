@@ -16,7 +16,7 @@ public class LevelGrid : MonoBehaviour
     public static LevelGrid Instance { get; private set; }
     [SerializeField] private Transform _gridDebugObjectTransform;
     private GridSystem<GridObject> _gridSystem;
-    public GridSystem<GridObject>  GridSystem => _gridSystem;
+    public GridSystem<GridObject> GridSystem => _gridSystem;
     private int _width = 10;
     private int _height = 10;
     private float _cellSize = 2f;
@@ -85,7 +85,7 @@ public class LevelGrid : MonoBehaviour
     public bool IsPossibleGridPosition(GridPosition gridPosition, BaseAction action)
     {
         if (!_gridSystem.IsValidGridPosition(gridPosition)) return false;
-        foreach (var actionGridPosition in action.GetValidActionGridPositionList())
+        foreach (var actionGridPosition in action.GetPossibleActionGridPositionList())
         {
             if (gridPosition == actionGridPosition) return true;
         }
@@ -95,6 +95,7 @@ public class LevelGrid : MonoBehaviour
 
     public bool IsReachablePosition(GridPosition gridPosition, BaseAction action)
     {
+        if (action is null) return false;
         if (!_gridSystem.IsValidGridPosition(gridPosition)) return false;
         foreach (var actionGridPosition in action.GetReachableActionGridPositionList())
         {

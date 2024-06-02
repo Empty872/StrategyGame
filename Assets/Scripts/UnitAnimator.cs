@@ -59,7 +59,8 @@ public class UnitAnimator : MonoBehaviour
         var grenadeTransform = Instantiate(_grenadeProjectilePrefab, transform.position, Quaternion.identity);
         var grenade = grenadeTransform.GetComponent<GrenadeProjectile>();
         var targetUnitGridPosition = e.targetGridPosition;
-        grenade.Setup(targetUnitGridPosition, e.affectedGridPositions, e.onHitAffectAction);
+        grenade.Setup(targetUnitGridPosition, 
+            e.onHitAffectAction);
     }
 
     private void MoveAction_OnStartMoving(object sender, EventArgs e)

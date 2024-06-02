@@ -28,23 +28,11 @@ public class GridVisualManager: MonoBehaviour
 
     public Material GetReachableColor(BaseAction action)
     {
-        return action switch
-        {
-            MoveAction => _colorMaterialDictionary[GridColorEnum.Blue].Material,
-            SpinAction => _colorMaterialDictionary[GridColorEnum.Blue].Material,
-            InteractAction => _colorMaterialDictionary[GridColorEnum.Green].Material,
-            _ => _colorMaterialDictionary[GridColorEnum.Red].Material
-        };
+        return _colorMaterialDictionary[action.GetColor()].Material;
     }
 
     public Material GetPossibleColor(BaseAction action)
     {
-        return action switch
-        {
-            MoveAction => _colorMaterialDictionary[GridColorEnum.Blue].HighlightedMaterial,
-            SpinAction => _colorMaterialDictionary[GridColorEnum.Blue].HighlightedMaterial,
-            InteractAction => _colorMaterialDictionary[GridColorEnum.Green].HighlightedMaterial,
-            _ => _colorMaterialDictionary[GridColorEnum.Red].HighlightedMaterial
-        };
+        return _colorMaterialDictionary[action.GetColor()].HighlightedMaterial;
     }
 }

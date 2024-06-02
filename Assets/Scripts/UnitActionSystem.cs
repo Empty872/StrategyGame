@@ -15,7 +15,7 @@ public class UnitActionSystem : MonoBehaviour
     public event EventHandler<bool> OnBusyChanged;
     public event EventHandler OnActionStarted;
     public static UnitActionSystem Instance { get; private set; }
-    private bool _isBusy;
+    public bool IsBusy { get; private set; }
     public BaseAction SelectedAction { get; private set; }
 
     private void Awake()
@@ -32,11 +32,18 @@ public class UnitActionSystem : MonoBehaviour
     private void Start()
     {
         SelectUnit(_selectedUnit);
+        TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
+    }
+
+    private void TurnSystem_OnTurnChanged(object sender, TurnSystem.OnTurnChangedEventArgs e)
+    {
+        if (!e.isPlayerTurn) return;
+        SelectUnit(UnitManager.Instance.FriendlyUnitList[0]);
     }
 
     void Update()
     {
-        if (_isBusy) return;
+        if (IsBusy) return;
         if (!TurnSystem.Instance.IsPlayerTurn) return;
         if (EventSystem.current.IsPointerOverGameObject()) return;
         if (TryHandleUnitSelection()) return;
@@ -45,7 +52,7 @@ public class UnitActionSystem : MonoBehaviour
 
     private void HandleSelectedAction()
     {
-        if (InputManager.Instance.IsMouseButtonDownThisFrame())
+        if (InputManager.Instance.IsLeftMouseButtonDownThisFrame())
         {
             var mouseGridPosition = LevelGrid.Instance.GetGridPosition(MouseWorld.GetPosition());
             if (!SelectedAction.IsValidActionGridPosition(mouseGridPosition)) return;
@@ -58,7 +65,7 @@ public class UnitActionSystem : MonoBehaviour
 
     private bool TryHandleUnitSelection()
     {
-        if (!InputManager.Instance.IsMouseButtonDownThisFrame()) return false;
+        if (!InputManager.Instance.IsRightMouseButtonDownThisFrame()) return false;
         var ray = Camera.main.ScreenPointToRay(InputManager.Instance.GetMouseScreenPosition());
         if (Physics.Raycast(ray, out RaycastHit raycastHit, float.MaxValue, _unitLayerMask))
         {
@@ -74,7 +81,7 @@ public class UnitActionSystem : MonoBehaviour
         return false;
     }
 
-    private void SelectUnit(Unit unit)
+    public void SelectUnit(Unit unit, bool isEnemyTurn = false)
     {
         _selectedUnit = unit;
         SelectAction(unit.GetAction<MoveAction>());
@@ -83,14 +90,14 @@ public class UnitActionSystem : MonoBehaviour
 
     private void SetBusy()
     {
-        _isBusy = true;
-        OnBusyChanged?.Invoke(this, _isBusy);
+        IsBusy = true;
+        OnBusyChanged?.Invoke(this, IsBusy);
     }
 
     private void ClearBusy()
     {
-        _isBusy = false;
-        OnBusyChanged?.Invoke(this, _isBusy);
+        IsBusy = false;
+        OnBusyChanged?.Invoke(this, IsBusy);
     }
 
     public void SelectAction(BaseAction action)

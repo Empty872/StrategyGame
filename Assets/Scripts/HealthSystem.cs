@@ -5,23 +5,43 @@ using UnityEngine;
 
 public class HealthSystem : MonoBehaviour
 {
-    [SerializeField] private float _maxHealth = 10;
     public event EventHandler OnDeath;
-    public event EventHandler OnTakeDamage;
+    public event EventHandler OnHealthChanged;
+    public static event EventHandler OnAnyHealthChanged;
 
-    private float _health;
+    private int _health;
+    public int MaxHealth => _unitCharacteristic.MaxHealth;
+    public int Health => _health;
+    private UnitCharacteristic _unitCharacteristic;
 
     // Start is called before the first frame update
     private void Awake()
     {
-        _health = _maxHealth;
+        _unitCharacteristic = GetComponent<UnitCharacteristic>();
     }
 
-    public void TakeDamage(float damage)
+    private void Start()
+    {
+        _health = MaxHealth;
+        OnHealthChanged?.Invoke(this, EventArgs.Empty);
+        OnAnyHealthChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    public void TakeDamage(int damage)
     {
         _health -= damage;
-        OnTakeDamage?.Invoke(this, EventArgs.Empty);
+        OnHealthChanged?.Invoke(this, EventArgs.Empty);
+        OnAnyHealthChanged?.Invoke(this, EventArgs.Empty);
+
         if (_health <= 0) Die();
+    }
+
+    public void RestoreHealth(int count)
+    {
+        _health += count;
+        _health = Mathf.Min(_health, MaxHealth);
+        OnHealthChanged?.Invoke(this, EventArgs.Empty);
+        OnAnyHealthChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private void Die()
@@ -29,5 +49,5 @@ public class HealthSystem : MonoBehaviour
         OnDeath?.Invoke(this, EventArgs.Empty);
     }
 
-    public float GetHealthNormalized() => _health / _maxHealth;
+    public float GetHealthNormalized() => (float)_health / _unitCharacteristic.MaxHealth;
 }

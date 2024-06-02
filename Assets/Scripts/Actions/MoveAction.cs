@@ -5,9 +5,17 @@ using UnityEngine;
 
 public class MoveAction : BaseAction
 {
+    public override GridColorEnum GetColor() => GridColorEnum.Blue;
+
+    protected override int GetActionRange() => Unit.MovementPoints;
+    protected override bool CanBeUsedOnAllies() => false;
+    protected override bool CanBeUsedOnEnemies() => false;
+    protected override bool CanBeUsedOnEmpty() => true;
+    public override string GetDescription() => "Move Unit";
+    public override int GetActionPointsCost() => 0;
+
     public event EventHandler OnStartMoving;
     public event EventHandler OnStopMoving;
-    private int _maxMovementDistance = 4;
     private List<Vector3> _targetPositionList;
     private int _currentPositionIndex;
     private float _speed = 5;
@@ -37,6 +45,10 @@ public class MoveAction : BaseAction
             }
         }
     }
+    protected override void AffectGridPosition(GridPosition gridPosition)
+    {
+        return;
+    }
 
     public override void TakeAction(GridPosition targetGridPosition, Action actionOnComplete)
     {
@@ -44,72 +56,18 @@ public class MoveAction : BaseAction
             Pathfinding.Instance.FindPath(Unit.GridPosition, targetGridPosition, out int pathLength);
         _currentPositionIndex = 0;
         _targetPositionList = new List<Vector3>();
-        StartAction(actionOnComplete);
         foreach (var pathGridPosition in pathGridPositionList)
         {
             _targetPositionList.Add(LevelGrid.Instance.GetWorldPosition(pathGridPosition));
         }
-    }
-
-    public override List<GridPosition> GetReachableActionGridPositionList()
-    {
-        var reachableGridPositionList = new List<GridPosition>();
-        var unitGridPosition = Unit.GridPosition;
-
-        for (int x = -_maxMovementDistance; x <= _maxMovementDistance; x++)
-        {
-            for (int z = -_maxMovementDistance; z <= _maxMovementDistance; z++)
-            {
-                var offsetGridPosition = new GridPosition(x, z);
-                var possibleGridPosition = unitGridPosition + offsetGridPosition;
-                if (!LevelGrid.Instance.IsValidGridPosition(possibleGridPosition))
-                {
-                    continue;
-                }
-
-
-                var possibleDistance = Mathf.Abs(x) + Mathf.Abs(z);
-                if (possibleDistance > _maxMovementDistance) continue;
-                if (Unit.GridPosition == possibleGridPosition)
-                {
-                    // Same Grid Position where the unit is already at
-                    continue;
-                }
-
-                if (LevelGrid.Instance.HasAnyUnitOnGridPosition(possibleGridPosition))
-                {
-                    // Grid Position already occupied with another Unit
-                    continue;
-                }
-
-                // if (!Pathfinding.Instance.IsWalkableGridPosition(possibleGridPosition)) continue;
-                if (!Pathfinding.Instance.HasPath(unitGridPosition, possibleGridPosition)) continue;
-                var pathfindDistanceMultiplier = 10;
-                if (Pathfinding.Instance.GetPathLength(unitGridPosition, possibleGridPosition) >
-                    _maxMovementDistance * pathfindDistanceMultiplier) continue;
-                reachableGridPositionList.Add(possibleGridPosition);
-            }
-        }
-
-        return reachableGridPositionList;
-    }
-
-    public override List<GridPosition> GetValidActionGridPositionList()
-    {
-        var validGridPositionList = new List<GridPosition>();
-        foreach (var gridPosition in GetReachableActionGridPositionList())
-        {
-            validGridPositionList.Add(gridPosition);
-        }
-
-        return validGridPositionList;
+        StartAction(actionOnComplete);
+        Unit.SpendMovementPoints(GridPosition.GetDistance(targetGridPosition, Unit.GridPosition));
     }
 
     public override string GetName() => "Move";
 
     public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
     {
-        int targetCountAtGridPosition = Unit.GetAction<ShootAction>().GetTargetCountAtPosition(gridPosition);
-        return new EnemyAIAction { gridPosition = gridPosition, actionPriority = targetCountAtGridPosition * 10 };
+        return new EnemyAIAction { gridPosition = gridPosition, actionPriority = 10 };
     }
 }

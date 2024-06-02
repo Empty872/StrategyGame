@@ -10,10 +10,20 @@ public class SwordAction : BaseAction
     public event EventHandler OnSwordActionCompleted;
 
     public override string GetName() => "Sword";
+    protected override int GetActionRange() => 1;
+    protected override ActionRangeType GetActionRangeType() => ActionRangeType.Square;
+    protected override bool CanBeUsedOnAllies() => false;
+    protected override bool CanBeUsedOnEnemies() => true;
+
     private int _maxAttackDistance = 1;
     private float _stateTimer;
     private State _state;
     public Unit TargetUnit { get; private set; }
+
+    protected override void AffectGridPosition(GridPosition gridPosition)
+    {
+        Attack();
+    }
 
     private enum State
     {
@@ -52,7 +62,7 @@ public class SwordAction : BaseAction
                 _state = State.SwingingAfterHit;
                 var afterHitStateTime = 0.5f;
                 _stateTimer = afterHitStateTime;
-                Attack();
+                PerformAction(TargetUnit.GridPosition);
                 break;
             case State.SwingingAfterHit:
                 OnSwordActionCompleted?.Invoke(this, EventArgs.Empty);
@@ -73,64 +83,6 @@ public class SwordAction : BaseAction
         StartAction(actionOnComplete);
     }
 
-    public override List<GridPosition> GetReachableActionGridPositionList()
-    {
-        var unitGridPosition = Unit.GridPosition;
-        return GetReachableActionGridPositionList(unitGridPosition);
-    }
-
-    public List<GridPosition> GetReachableActionGridPositionList(GridPosition unitGridPosition)
-    {
-        var reachableGridPositionList = new List<GridPosition>();
-        // var unitGridPosition = Unit.GridPosition;
-
-        for (int x = -_maxAttackDistance; x <= _maxAttackDistance; x++)
-        {
-            for (int z = -_maxAttackDistance; z <= _maxAttackDistance; z++)
-            {
-                var offsetGridPosition = new GridPosition(x, z);
-                var possibleGridPosition = unitGridPosition + offsetGridPosition;
-                if (!LevelGrid.Instance.IsValidGridPosition(possibleGridPosition))
-                {
-                    continue;
-                }
-
-                var possibleDistance = Mathf.Abs(x) + Mathf.Abs(z);
-                // if (possibleDistance > _maxAttackDistance) continue;
-                reachableGridPositionList.Add(possibleGridPosition);
-            }
-        }
-
-        return reachableGridPositionList;
-    }
-
-    public override List<GridPosition> GetValidActionGridPositionList()
-    {
-        var unitGridPosition = Unit.GridPosition;
-        return GetValidActionGridPositionList(unitGridPosition);
-    }
-
-    public List<GridPosition> GetValidActionGridPositionList(GridPosition unitGridPosition)
-    {
-        var validGridPositionList = new List<GridPosition>();
-        foreach (var gridPosition in GetReachableActionGridPositionList(unitGridPosition))
-        {
-            if (!LevelGrid.Instance.HasAnyUnitOnGridPosition(gridPosition))
-            {
-                // Grid Position is empty;
-                continue;
-            }
-
-            // Both enemies in same team
-            var targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
-            if (targetUnit.IsEnemy == Unit.IsEnemy) continue;
-
-            validGridPositionList.Add(gridPosition);
-        }
-
-        return validGridPositionList;
-    }
-
     private void Attack()
     {
         TargetUnit.TakeDamage(100);
@@ -147,8 +99,7 @@ public class SwordAction : BaseAction
         };
     }
 
-    public int GetTargetCountAtPosition(GridPosition unitGridPosition)
-    {
-        return GetValidActionGridPositionList(unitGridPosition).Count;
-    }
+    public override GridColorEnum GetColor() => GridColorEnum.Red;
+    protected override float GetModifier() => 1;
+    public override string GetDescription() => "Attack enemy in melee combat using ATK";
 }

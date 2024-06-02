@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class ShootAction : BaseAction
 {
+    protected override int GetActionRange() => 5;
+
     public static event EventHandler<OnShootEventArgs> OnAnyShoot;
     public event EventHandler<OnShootEventArgs> OnShoot;
 
@@ -16,9 +18,13 @@ public class ShootAction : BaseAction
 
     public override string GetName() => "Shoot";
     private int _maxShootDistance = 6;
+    protected override bool CanBeUsedOnAllies() => false;
+    protected override bool CanBeUsedOnEnemies() => true;
+
     private float _stateTimer;
     private State _state;
     public Unit TargetUnit { get; private set; }
+    public GridPosition TargetGridPosition { get; private set; }
 
 
     private enum State
@@ -26,6 +32,10 @@ public class ShootAction : BaseAction
         Aiming,
         Shooting,
         CoolOff
+    }
+    protected override void AffectGridPosition(GridPosition gridPosition)
+    {
+        Shoot();
     }
 
     private void Update()
@@ -40,8 +50,7 @@ public class ShootAction : BaseAction
                 transform.forward = Vector3.Lerp(transform.forward, moveDirection, rotationSpeed * Time.deltaTime);
                 break;
             case State.Shooting:
-                Shoot();
-
+                PerformAction(TargetGridPosition);
                 break;
             case State.CoolOff:
                 break;
@@ -78,6 +87,7 @@ public class ShootAction : BaseAction
 
     public override void TakeAction(GridPosition gridPosition, Action actionOnComplete)
     {
+        TargetGridPosition = gridPosition;
         TargetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
         _state = State.Aiming;
         var aimingStateTime = 1f;
@@ -85,63 +95,6 @@ public class ShootAction : BaseAction
         StartAction(actionOnComplete);
     }
 
-    public override List<GridPosition> GetReachableActionGridPositionList()
-    {
-        var unitGridPosition = Unit.GridPosition;
-        return GetReachableActionGridPositionList(unitGridPosition);
-    }
-
-    public List<GridPosition> GetReachableActionGridPositionList(GridPosition unitGridPosition)
-    {
-        var reachableGridPositionList = new List<GridPosition>();
-        // var unitGridPosition = Unit.GridPosition;
-
-        for (int x = -_maxShootDistance; x <= _maxShootDistance; x++)
-        {
-            for (int z = -_maxShootDistance; z <= _maxShootDistance; z++)
-            {
-                var offsetGridPosition = new GridPosition(x, z);
-                var possibleGridPosition = unitGridPosition + offsetGridPosition;
-                if (!LevelGrid.Instance.IsValidGridPosition(possibleGridPosition))
-                {
-                    continue;
-                }
-
-                var possibleDistance = Mathf.Abs(x) + Mathf.Abs(z);
-                if (possibleDistance > _maxShootDistance) continue;
-                reachableGridPositionList.Add(possibleGridPosition);
-            }
-        }
-
-        return reachableGridPositionList;
-    }
-
-    public override List<GridPosition> GetValidActionGridPositionList()
-    {
-        var unitGridPosition = Unit.GridPosition;
-        return GetValidActionGridPositionList(unitGridPosition);
-    }
-
-    public List<GridPosition> GetValidActionGridPositionList(GridPosition unitGridPosition)
-    {
-        var validGridPositionList = new List<GridPosition>();
-        foreach (var gridPosition in GetReachableActionGridPositionList(unitGridPosition))
-        {
-            if (!LevelGrid.Instance.HasAnyUnitOnGridPosition(gridPosition))
-            {
-                // Grid Position is empty;
-                continue;
-            }
-
-            // Both enemies in same team
-            var targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
-            if (targetUnit.IsEnemy == Unit.IsEnemy) continue;
-
-            validGridPositionList.Add(gridPosition);
-        }
-
-        return validGridPositionList;
-    }
 
     private void Shoot()
     {
@@ -160,8 +113,6 @@ public class ShootAction : BaseAction
         };
     }
 
-    public int GetTargetCountAtPosition(GridPosition unitGridPosition)
-    {
-        return GetValidActionGridPositionList(unitGridPosition).Count;
-    }
+    public override GridColorEnum GetColor() => GridColorEnum.Red;
+    public override string GetDescription() => "Attack enemy from distance using ATK";
 }

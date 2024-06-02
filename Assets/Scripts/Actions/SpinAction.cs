@@ -13,7 +13,7 @@ public class SpinAction : BaseAction
         if (!IsActive) return;
         transform.eulerAngles += new Vector3(0, _rotationSpeed * Time.deltaTime, 0);
         _currentRotatedAngle += _rotationSpeed * Time.deltaTime;
-        if (_currentRotatedAngle >= 360) CompleteAction();
+        if (_currentRotatedAngle >= 360) PerformAction(Unit.GridPosition);
     }
 
     public override void TakeAction(GridPosition gridPosition, Action actionOnComplete)
@@ -21,21 +21,20 @@ public class SpinAction : BaseAction
         _currentRotatedAngle = 0;
         StartAction(actionOnComplete);
     }
+    protected override void AffectGridPosition(GridPosition gridPosition)
+    {
+        return;
+    }
 
     public override string GetName() => "Spin";
+    public override GridColorEnum GetColor() => GridColorEnum.Green;
 
+    protected override int GetActionRange() => 0;
+    protected override bool CanBeUsedOnAllies() => false;
+    protected override bool CanBeUsedOnEnemies() => false;
+    public override string GetDescription() => "Spin";
 
-    public override List<GridPosition> GetReachableActionGridPositionList()
-    {
-        return new List<GridPosition> { Unit.GridPosition };
-    }
-
-    public override List<GridPosition> GetValidActionGridPositionList()
-    {
-        return GetReachableActionGridPositionList();
-    }
-
-    public override int GetCost() => 2;
+    public override int GetActionPointsCost() => 2;
 
     public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
     {

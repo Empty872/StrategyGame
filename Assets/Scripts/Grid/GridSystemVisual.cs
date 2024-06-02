@@ -24,7 +24,6 @@ public class GridSystemVisual : MonoBehaviour
 
     private void Start()
     {
-
         _gridSystemVisualSingleArray = new GridSystemVisualSingle[LevelGrid.Instance.Width, LevelGrid.Instance.Height];
         for (var x = 0; x < LevelGrid.Instance.Width; x++)
         {
@@ -40,6 +39,12 @@ public class GridSystemVisual : MonoBehaviour
         LevelGrid.Instance.OnAnyUnitMovedGridPosition += LevelGrid_OnAnyUnitMovedGridPosition;
         UnitActionSystem.Instance.OnSelectedActionChanged += UnitActionSystem_OnSelectedActionChanged;
         UnitActionSystem.Instance.OnBusyChanged += UnitActionSystem_OnBusyChanged;
+        TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
+        UpdateGridVisual();
+    }
+
+    private void TurnSystem_OnTurnChanged(object sender, TurnSystem.OnTurnChangedEventArgs e)
+    {
         UpdateGridVisual();
     }
 
@@ -85,10 +90,11 @@ public class GridSystemVisual : MonoBehaviour
             ShowPossibleGridPosition(gridPosition);
         }
     }
+
     public void ShowPossibleGridPosition(GridPosition gridPosition)
     {
         _gridSystemVisualSingleArray[gridPosition.x, gridPosition.z]
-                .Show(GetPossibleGridMaterial());
+            .Show(GetPossibleGridMaterial());
     }
 
     public void HideAllGridPositions()
@@ -110,18 +116,21 @@ public class GridSystemVisual : MonoBehaviour
     public void UpdateGridVisual()
     {
         HideAllGridPositions();
+        if (UnitActionSystem.Instance.IsBusy) return;
+        if (!TurnSystem.Instance.IsPlayerTurn) return;
         var selectedAction = UnitActionSystem.Instance.SelectedAction;
-
-        ShowReachableGridPositions(selectedAction.GetReachableActionGridPositionList());
+        if (selectedAction is not null) ShowReachableGridPositions(selectedAction.GetReachableActionGridPositionList());
     }
 
     public void UpdateMouseGridVisual()
     {
         if (EventSystem.current.IsPointerOverGameObject()) return;
+        if (UnitActionSystem.Instance.IsBusy) return;
+        if (!TurnSystem.Instance.IsPlayerTurn) return;
         var mouseGridPosition = LevelGrid.Instance.GetGridPosition(MouseWorld.GetPosition());
         var selectedAction = UnitActionSystem.Instance.SelectedAction;
         var mouseGridPositionList = new List<GridPosition>();
-        if (LevelGrid.Instance.IsValidGridPosition(mouseGridPosition))
+        if (LevelGrid.Instance.IsValidGridPosition(mouseGridPosition) && selectedAction is not null)
             mouseGridPositionList = selectedAction.GetAffectedGridPositionList(mouseGridPosition);
 
         foreach (var gridPosition in _mouseGridPositionList)

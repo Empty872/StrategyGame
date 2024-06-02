@@ -27,9 +27,13 @@ public class InputManager : MonoBehaviour
         return Mouse.current.position.ReadValue();
     }
 
-    public bool IsMouseButtonDownThisFrame()
+    public bool IsLeftMouseButtonDownThisFrame()
     {
-        return _playerInputActions.Player.Click.WasPerformedThisFrame();
+        return _playerInputActions.Player.LeftClick.WasPerformedThisFrame();
+    }
+    public bool IsRightMouseButtonDownThisFrame()
+    {
+        return _playerInputActions.Player.RightClick.WasPerformedThisFrame();
     }
 
     public Vector2 GetCameraMoveVector()
