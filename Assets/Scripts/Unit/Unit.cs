@@ -16,6 +16,7 @@ public class Unit : MonoBehaviour
 
     public int ActionPoints { get; private set; }
     public int MovementPoints { get; private set; }
+    public List<Buff> BuffList => _buffSystem.BuffList;
 
     // public int ActionPoints { get; private set; }
     public static event EventHandler OnAnyActionPointsChanged;

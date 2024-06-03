@@ -5,8 +5,9 @@ using UnityEngine;
 
 public class BuffSystem : MonoBehaviour
 {
-    private List<Buff> _buffList = new();
+    public List<Buff> BuffList { get; private set; } = new();
     private Unit _unit;
+    public static event EventHandler OnAnyBuffListChanged;
 
     private void Awake()
     {
@@ -21,17 +22,27 @@ public class BuffSystem : MonoBehaviour
     private void TurnSystem_OnTurnChanged(object sender, TurnSystem.OnTurnChangedEventArgs e)
     {
         if (e.isPlayerTurn == _unit.IsEnemy) return;
-        foreach (var buff in _buffList)
+
+        for (int i = 0; i < BuffList.Count; i++)
         {
+            var buff = BuffList[i];
             buff.ReduceCooldown();
-            if (buff.CurrentCooldown <= 0) DeactivateBuff(buff);
+            if (buff.CurrentCooldown <= 0) RemoveBuff(buff);
         }
     }
 
     public void AddBuff(Buff buff)
     {
         ActivateBuff(buff);
-        _buffList.Add(buff);
+        BuffList.Add(buff);
+        OnAnyBuffListChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    public void RemoveBuff(Buff buff)
+    {
+        DeactivateBuff(buff);
+        BuffList.Remove(buff);
+        OnAnyBuffListChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private void ActivateBuff(Buff buff)

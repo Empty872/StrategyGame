@@ -15,13 +15,13 @@ public class FortifyAction : BaseAction
     private int _maxDistance = 0;
     private int _extraDefense = 20;
     private int _effectDuration = 2;
-    
+
 
     protected override void AffectGridPosition(GridPosition gridPosition)
     {
         RiseDefense();
     }
-    
+
 
     public override void TakeAction(GridPosition gridPosition, Action actionOnComplete)
     {
@@ -33,7 +33,8 @@ public class FortifyAction : BaseAction
 
     private void RiseDefense()
     {
-        Unit.AddBuff(new Buff(CharacteristicType.Defense, _extraDefense, GetCooldown()));
+        Unit.AddBuff(new Buff(CharacteristicType.Defense, _extraDefense, _effectDuration, "Fortify",
+            "Defence increased by " + _extraDefense));
     }
 
     public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
@@ -46,7 +47,9 @@ public class FortifyAction : BaseAction
     }
 
     public override GridColorEnum GetColor() => GridColorEnum.Green;
-    public override string GetDescription() => "Increases DEF by " + _extraDefense + " for " + _effectDuration + " turns";
+
+    public override string GetDescription() =>
+        "Increases DEF by " + _extraDefense + " for " + _effectDuration + " turns";
 
     public override int GetCooldown() => 3;
 }

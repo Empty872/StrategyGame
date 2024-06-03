@@ -29,6 +29,7 @@ public class BattleCryAction : BaseAction
             RiseAttack(unit);
         }
     }
+
     public override List<GridPosition> GetAffectedGridPositionList(GridPosition gridPosition)
     {
         if (!LevelGrid.Instance.IsReachablePosition(gridPosition, this)) return new List<GridPosition>();
@@ -37,7 +38,8 @@ public class BattleCryAction : BaseAction
 
     private void RiseAttack(Unit unit)
     {
-        unit.AddBuff(new Buff(CharacteristicType.Attack, _extraAttack, GetCooldown()));
+        unit.AddBuff(new Buff(CharacteristicType.Attack, _extraAttack, _effectDuration, "Battle Cry",
+            "Attack increased by " + _extraAttack));
     }
 
     public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
@@ -60,5 +62,4 @@ public class BattleCryAction : BaseAction
 
     public override string GetDescription() =>
         "Increases allies' ATK by " + _extraAttack + " for " + _effectDuration + " turns";
-    
 }
