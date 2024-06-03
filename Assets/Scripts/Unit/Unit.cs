@@ -6,6 +6,8 @@ using UnityEngine.Serialization;
 
 public class Unit : MonoBehaviour
 {
+    [SerializeField] private GameObject _faceCamera;
+    public GameObject FaceCamera => _faceCamera;
     public GridPosition GridPosition { get; private set; }
     public Vector3 WorldPosition => transform.position;
     public BaseAction[] ActionArray { get; private set; }

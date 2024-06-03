@@ -14,11 +14,9 @@ public class SwordAction : BaseAction
     protected override ActionRangeType GetActionRangeType() => ActionRangeType.Square;
     protected override bool CanBeUsedOnAllies() => false;
     protected override bool CanBeUsedOnEnemies() => true;
-    [SerializeField] private float _beforeHitTime = 0.7f;
-    [SerializeField] private float _afterHitTime = 0.5f;
-    [SerializeField] private float _rotationSpeed = 10f;
-
-    private int _maxAttackDistance = 1;
+    private float _beforeHitTime = 0.7f;
+    private float _afterHitTime = 0.5f;
+    private float _rotationSpeed = 10f;
     private float _stateTimer;
     private State _state;
     public Unit TargetUnit { get; private set; }

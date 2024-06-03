@@ -102,6 +102,7 @@ public class UnitActionSystem : MonoBehaviour
 
     public void SelectAction(BaseAction action)
     {
+        if (action is not null && !action.CanBeUsed()) return;
         SelectedAction = action;
         OnSelectedActionChanged?.Invoke(this, EventArgs.Empty);
     }

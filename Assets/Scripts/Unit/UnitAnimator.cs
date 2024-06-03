@@ -31,11 +31,18 @@ public class UnitAnimator : MonoBehaviour
             grenadeAction.OnThrow += GrenadeAction_OnThrow;
         }
 
-        if (TryGetComponent(out SwordAction swordAction))
+        var swordActions = GetComponents<SwordAction>();
+        foreach (var swordAction in swordActions)
         {
             swordAction.OnSwordActionStarted += SwordAction_OnSwordActionStarted;
             swordAction.OnSwordActionCompleted += SwordAction_OnSwordActionCompleted;
         }
+
+        // if (TryGetComponent(out SwordAction swordAction))
+        // {
+        //     swordAction.OnSwordActionStarted += SwordAction_OnSwordActionStarted;
+        //     swordAction.OnSwordActionCompleted += SwordAction_OnSwordActionCompleted;
+        // }
     }
 
     private void Start()
@@ -59,7 +66,7 @@ public class UnitAnimator : MonoBehaviour
         var grenadeTransform = Instantiate(_grenadeProjectilePrefab, transform.position, Quaternion.identity);
         var grenade = grenadeTransform.GetComponent<GrenadeProjectile>();
         var targetUnitGridPosition = e.targetGridPosition;
-        grenade.Setup(targetUnitGridPosition, 
+        grenade.Setup(targetUnitGridPosition,
             e.onHitAffectAction);
     }
 
