@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -23,24 +24,25 @@ public class UnitCharacteristic : MonoBehaviour
     public int MaxHealth => _maxHealth;
     public int MaxActionPoints => _maxActionPoints;
 
-    public void ChangeDefense(int amount)
+    public void ChangeCharacteristic(CharacteristicType characteristicType, int amount)
     {
-        _defenseExtra += amount;
+        switch (characteristicType)
+        {
+            case CharacteristicType.Attack:
+                _attackExtra += amount;
+                break;
+            case CharacteristicType.MagicAttack:
+                _magicAttack += amount;
+                break;
+            case CharacteristicType.Defense:
+                _defense += amount;
+                break;
+            case CharacteristicType.Speed:
+                _speed += amount;
+                break;
+            default:
+                throw new NotImplementedException();
+        }
         OnAnyUnitCharacteristicChanged?.Invoke(this, EventArgs.Empty);
-    }
-
-    public void ChangeAttack(int amount)
-    {
-        _attackExtra += amount;
-        OnAnyUnitCharacteristicChanged?.Invoke(this, EventArgs.Empty);
-    }
-
-    void Start()
-    {
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
     }
 }

@@ -33,8 +33,7 @@ public class FortifyAction : BaseAction
 
     private void RiseDefense()
     {
-        Unit.ChangeDefense(_extraDefense);
-        new DelayedAction(() => Unit.ChangeDefense(-_extraDefense), _effectDuration, !Unit.IsEnemy);
+        Unit.AddBuff(new Buff(CharacteristicType.Defense, _extraDefense, GetCooldown()));
     }
 
     public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)

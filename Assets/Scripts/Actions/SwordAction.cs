@@ -14,6 +14,9 @@ public class SwordAction : BaseAction
     protected override ActionRangeType GetActionRangeType() => ActionRangeType.Square;
     protected override bool CanBeUsedOnAllies() => false;
     protected override bool CanBeUsedOnEnemies() => true;
+    [SerializeField] private float _beforeHitTime = 0.7f;
+    [SerializeField] private float _afterHitTime = 0.5f;
+    [SerializeField] private float _rotationSpeed = 10f;
 
     private int _maxAttackDistance = 1;
     private float _stateTimer;
@@ -38,9 +41,7 @@ public class SwordAction : BaseAction
         switch (_state)
         {
             case State.SwingingBeforeHit:
-                var rotationSpeed = 10;
-                var attackDirection = (TargetUnit.WorldPosition - transform.position).normalized;
-                transform.forward = Vector3.Lerp(transform.forward, attackDirection, rotationSpeed * Time.deltaTime);
+                RotateTowardsTarget();
                 break;
             case State.SwingingAfterHit:
                 break;
@@ -53,6 +54,12 @@ public class SwordAction : BaseAction
             NextState();
         }
     }
+    private void RotateTowardsTarget()
+    {
+        var attackDirection = (TargetUnit.WorldPosition - transform.position).normalized;
+        transform.forward = Vector3.Lerp(transform.forward, attackDirection, _rotationSpeed * Time.deltaTime);
+    }
+
 
     private void NextState()
     {
@@ -60,8 +67,7 @@ public class SwordAction : BaseAction
         {
             case State.SwingingBeforeHit:
                 _state = State.SwingingAfterHit;
-                var afterHitStateTime = 0.5f;
-                _stateTimer = afterHitStateTime;
+                _stateTimer = _afterHitTime;
                 PerformAction(TargetUnit.GridPosition);
                 break;
             case State.SwingingAfterHit:
@@ -77,21 +83,19 @@ public class SwordAction : BaseAction
     {
         TargetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
         _state = State.SwingingBeforeHit;
-        var beforeStateTime = 0.7f;
-        _stateTimer = beforeStateTime;
+        _stateTimer = _beforeHitTime;
         OnSwordActionStarted?.Invoke(this, EventArgs.Empty);
         StartAction(actionOnComplete);
     }
 
     private void Attack()
     {
-        TargetUnit.TakeDamage(100);
+        TargetUnit.TakeDamage(GetFinalDamage(Unit.Attack, TargetUnit.Defense));
         OnAnyAttack?.Invoke(this, EventArgs.Empty);
     }
 
     public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
     {
-        var targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
         return new EnemyAIAction
         {
             gridPosition = gridPosition,

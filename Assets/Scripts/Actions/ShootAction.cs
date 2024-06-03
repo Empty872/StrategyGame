@@ -98,7 +98,7 @@ public class ShootAction : BaseAction
 
     private void Shoot()
     {
-        TargetUnit.TakeDamage(10);
+        TargetUnit.TakeDamage(GetFinalDamage(Unit.Attack, TargetUnit.Defense));
         OnShoot?.Invoke(this, new OnShootEventArgs { targetUnit = TargetUnit, shootingUnit = Unit });
         OnAnyShoot?.Invoke(this, new OnShootEventArgs { targetUnit = TargetUnit, shootingUnit = Unit });
     }
