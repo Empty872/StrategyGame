@@ -13,6 +13,8 @@ public class SelectedUnitUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _defenseText;
     [SerializeField] private TextMeshProUGUI _magicAttackText;
     [SerializeField] private TextMeshProUGUI _speedText;
+    [SerializeField] private Transform _buffPanelContainer;
+    [SerializeField] private Transform _buffPanelPrefab;
     private UnitActionSystem _unitActionSystem;
 
     private void Start()
@@ -21,8 +23,15 @@ public class SelectedUnitUI : MonoBehaviour
         _unitActionSystem.OnSelectedUnitChanged += UnitActionSystem_OnSelectedUnitChanged;
         UnitCharacteristic.OnAnyUnitCharacteristicChanged += UnitCharacteristic_OnAnyUnitCharacteristicChanged;
         HealthSystem.OnAnyHealthChanged += HealthSystem_OnAnyHealthChanged;
+        BuffSystem.OnAnyBuffListChanged += BuffSystem_OnAnyBuffListChanged;
         UpdateHealth();
         UpdateCharacteristic();
+        UpdateBuffs();
+    }
+
+    private void BuffSystem_OnAnyBuffListChanged(object sender, EventArgs e)
+    {
+        UpdateBuffs();
     }
 
     private void HealthSystem_OnAnyHealthChanged(object sender, EventArgs e)
@@ -39,6 +48,7 @@ public class SelectedUnitUI : MonoBehaviour
     {
         UpdateHealth();
         UpdateCharacteristic();
+        UpdateBuffs();
     }
 
 
@@ -56,5 +66,22 @@ public class SelectedUnitUI : MonoBehaviour
         _defenseText.text = "DEF" + "\n" + selectedUnit.Defense;
         _magicAttackText.text = "MAG" + "\n" + selectedUnit.MagicAttack;
         _speedText.text = "SPD" + "\n" + selectedUnit.Speed;
+    }
+
+    private void UpdateBuffs()
+    {
+        foreach (Transform buffPanel in _buffPanelContainer)
+        {
+            Destroy(buffPanel.gameObject);
+        }
+
+        var selectedUnit = _unitActionSystem.SelectedUnit;
+        var buffList = selectedUnit.BuffList;
+        foreach (var buff in buffList)
+        {
+            var buffPanelTransform = Instantiate(_buffPanelPrefab, _buffPanelContainer);
+            var buffPanelUI = buffPanelTransform.GetComponent<BuffPanelUI>();
+            buffPanelUI.SetBuff(buff);
+        }
     }
 }
