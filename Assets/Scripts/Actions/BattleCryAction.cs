@@ -37,8 +37,7 @@ public class BattleCryAction : BaseAction
 
     private void RiseAttack(Unit unit)
     {
-        unit.ChangeAttack(_extraAttack);
-        new DelayedAction(() => { unit.ChangeAttack(-_extraAttack); }, _effectDuration, !Unit.IsEnemy);
+        unit.AddBuff(new Buff(CharacteristicType.Attack, _extraAttack, GetCooldown()));
     }
 
     public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)

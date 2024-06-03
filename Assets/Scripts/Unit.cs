@@ -36,6 +36,8 @@ public class Unit : MonoBehaviour
     private HealthSystem _healthSystem;
 
     private UnitCharacteristic _unitCharacteristic;
+
+    private BuffSystem _buffSystem;
     // Update is called once per frame
 
     private void Awake()
@@ -43,6 +45,7 @@ public class Unit : MonoBehaviour
         ActionArray = GetComponents<BaseAction>();
         _healthSystem = GetComponent<HealthSystem>();
         _unitCharacteristic = GetComponent<UnitCharacteristic>();
+        _buffSystem = GetComponent<BuffSystem>();
     }
 
     private void Start()
@@ -143,12 +146,13 @@ public class Unit : MonoBehaviour
         return null;
     }
 
-    public void ChangeDefense(int amount)
+    public void ChangeCharacteristic(CharacteristicType characteristicType, int amount)
     {
-        _unitCharacteristic.ChangeDefense(amount);
+        _unitCharacteristic.ChangeCharacteristic(characteristicType, amount);
     }
-    public void ChangeAttack(int amount)
+
+    public void AddBuff(Buff buff)
     {
-        _unitCharacteristic.ChangeAttack(amount);
+        _buffSystem.AddBuff(buff);
     }
 }
