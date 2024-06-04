@@ -3,22 +3,25 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FortifyAction : BaseAction
+public class PrayerAction : BaseAction
 {
-    public override string GetName() => "Fortify";
+    public override string GetName() => "Prayer";
     protected override int GetActionRange() => 0;
     protected override bool CanBeUsedOnAllies() => true;
     protected override bool CanBeUsedOnOneself() => true;
     protected override bool CanBeUsedOnEnemies() => false;
     protected override ActionRangeType GetActionRangeType() => ActionRangeType.Square;
-
-    private int _extraDefense = 20;
-    private int _effectDuration = 2;
+    private int _extraDefense = 10;
+    private int _extraMagic = 10;
+    private int _effectDuration = 3;
 
 
     protected override void AffectGridPosition(GridPosition gridPosition)
     {
-        RiseDefense();
+        Unit.AddBuff(new Buff(CharacteristicType.Defense, _extraDefense, _effectDuration, "Prayer Defense",
+            "Defence increased by " + _extraDefense));
+        Unit.AddBuff(new Buff(CharacteristicType.MagicAttack, _extraMagic, _effectDuration, "Prayer Power",
+            "Magic increased by " + _extraMagic));
     }
 
 
@@ -29,12 +32,6 @@ public class FortifyAction : BaseAction
         CompleteAction();
     }
 
-
-    private void RiseDefense()
-    {
-        Unit.AddBuff(new Buff(CharacteristicType.Defense, _extraDefense, _effectDuration, "Fortify",
-            "Defence increased by " + _extraDefense));
-    }
 
     public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
     {
@@ -48,7 +45,7 @@ public class FortifyAction : BaseAction
     public override GridColorEnum GetColor() => GridColorEnum.Green;
 
     public override string GetDescription() =>
-        "Increases DEF by " + _extraDefense + " for " + _effectDuration + " turns";
+        "Increases DEF and MAG by " + _extraDefense + " for " + _effectDuration + " turns";
 
-    public override int GetCooldown() => 3;
+    public override int GetCooldown() => 5;
 }

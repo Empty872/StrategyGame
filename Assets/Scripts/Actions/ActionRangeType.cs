@@ -1,5 +1,6 @@
 ﻿public enum ActionRangeType
 {
     Square,
-    Rhombus
+    Rhombus,
+    VerticalHorizontal
 }

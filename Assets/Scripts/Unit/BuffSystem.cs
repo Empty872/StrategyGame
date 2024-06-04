@@ -47,11 +47,15 @@ public class BuffSystem : MonoBehaviour
 
     private void ActivateBuff(Buff buff)
     {
-        _unit.ChangeCharacteristic(buff.CharacteristicType, buff.Value);
+        if (buff.CharacteristicType is not CharacteristicType.Null)
+            _unit.ChangeCharacteristic(buff.CharacteristicType, buff.Value);
+        buff.OnObtainAction?.Invoke();
     }
 
     private void DeactivateBuff(Buff buff)
     {
-        _unit.ChangeCharacteristic(buff.CharacteristicType, -buff.Value);
+        if (buff.CharacteristicType is not CharacteristicType.Null)
+            _unit.ChangeCharacteristic(buff.CharacteristicType, -buff.Value);
+        buff.OnRemoveAction?.Invoke();
     }
 }

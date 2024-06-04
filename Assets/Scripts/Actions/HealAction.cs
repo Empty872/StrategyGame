@@ -7,13 +7,14 @@ public class HealAction : BaseAction
 {
     // public override int GetCooldown() => 1;
 
-    public int HealAmount => (int)(Unit.MagicAttack * 0.7f);
+    private int HealAmount => (int)(Unit.MagicAttack * GetModifier());
     public override string GetName() => "Heal";
     protected override int GetActionRange() => 1;
     protected override bool CanBeUsedOnAllies() => true;
     protected override bool CanBeUsedOnEnemies() => false;
     protected override ActionRangeType GetActionRangeType() => ActionRangeType.Square;
     public override int GetCooldown() => 1;
+    protected override float GetModifier() => 0.7f;
 
     public Unit TargetUnit { get; private set; }
 

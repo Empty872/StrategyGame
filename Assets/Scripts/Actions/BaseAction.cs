@@ -109,7 +109,8 @@ public abstract class BaseAction : MonoBehaviour
                 if (possibleGridPosition == Unit.GridPosition && !CanBeUsedOnOneself()) continue;
 
                 var possibleDistance = Mathf.Abs(x) + Mathf.Abs(z);
-                if (GetActionRangeType() == ActionRangeType.Rhombus && possibleDistance > GetActionRange()) continue;
+                if (GetActionRangeType() != ActionRangeType.Square && possibleDistance > GetActionRange()) continue;
+                if (GetActionRangeType() == ActionRangeType.VerticalHorizontal && x != 0 && z != 0) continue;
                 reachableGridPositionList.Add(possibleGridPosition);
             }
         }
@@ -157,6 +158,7 @@ public abstract class BaseAction : MonoBehaviour
             var enemyAIAction = GetEnemyAIAction(gridPosition);
             enemyAIActionList.Add(enemyAIAction);
         }
+
         if (enemyAIActionList.Count == 0) return null;
         // Debug.Log(enemyAIActionList.Count);
         enemyAIActionList = enemyAIActionList.OrderByDescending(element => element.actionPriority).ToList();

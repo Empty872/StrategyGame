@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class ShootAction : BaseAction
 {
-    protected override int GetActionRange() => 5;
+    protected override int GetActionRange() => 3;
 
     public static event EventHandler<OnShootEventArgs> OnAnyShoot;
     public event EventHandler<OnShootEventArgs> OnShoot;
@@ -15,9 +15,9 @@ public class ShootAction : BaseAction
         public Unit targetUnit;
         public Unit shootingUnit;
     }
+    
 
     public override string GetName() => "Shoot";
-    private int _maxShootDistance = 6;
     protected override bool CanBeUsedOnAllies() => false;
     protected override bool CanBeUsedOnEnemies() => true;
 
@@ -25,6 +25,7 @@ public class ShootAction : BaseAction
     private State _state;
     public Unit TargetUnit { get; private set; }
     public GridPosition TargetGridPosition { get; private set; }
+    private int _enhanсedModifier = 1;
 
 
     private enum State
@@ -115,4 +116,14 @@ public class ShootAction : BaseAction
 
     public override GridColorEnum GetColor() => GridColorEnum.Red;
     public override string GetDescription() => "Attack enemy from distance using ATK";
+    protected override float GetModifier() => _enhanсedModifier;
+
+    public void EnhanceAttack()
+    {
+        _enhanсedModifier = 3;
+    }
+    public void DisEnhanceAttack()
+    {
+        _enhanсedModifier = 1;
+    }
 }

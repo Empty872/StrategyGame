@@ -3,22 +3,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FortifyAction : BaseAction
+public class AmbushAction : BaseAction
 {
-    public override string GetName() => "Fortify";
+    public override string GetName() => "Ambush";
     protected override int GetActionRange() => 0;
     protected override bool CanBeUsedOnAllies() => true;
     protected override bool CanBeUsedOnOneself() => true;
     protected override bool CanBeUsedOnEnemies() => false;
-    protected override ActionRangeType GetActionRangeType() => ActionRangeType.Square;
-
-    private int _extraDefense = 20;
     private int _effectDuration = 2;
 
 
     protected override void AffectGridPosition(GridPosition gridPosition)
     {
-        RiseDefense();
+        Unit.AddBuff(new Buff(EnhanceShootAction, DisEnhanceShootAction, _effectDuration, GetName(),
+            "Shoot attack increased in 3 times"));
     }
 
 
@@ -27,13 +25,6 @@ public class FortifyAction : BaseAction
         StartAction(actionOnComplete);
         PerformAction(Unit.GridPosition);
         CompleteAction();
-    }
-
-
-    private void RiseDefense()
-    {
-        Unit.AddBuff(new Buff(CharacteristicType.Defense, _extraDefense, _effectDuration, "Fortify",
-            "Defence increased by " + _extraDefense));
     }
 
     public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
@@ -48,7 +39,17 @@ public class FortifyAction : BaseAction
     public override GridColorEnum GetColor() => GridColorEnum.Green;
 
     public override string GetDescription() =>
-        "Increases DEF by " + _extraDefense + " for " + _effectDuration + " turns";
+        "Increases Shoot attack damage in 3 times on next turn";
 
     public override int GetCooldown() => 3;
+
+    private void EnhanceShootAction()
+    {
+        GetComponent<ShootAction>().EnhanceAttack();
+    }
+
+    private void DisEnhanceShootAction()
+    {
+        GetComponent<ShootAction>().DisEnhanceAttack();
+    }
 }

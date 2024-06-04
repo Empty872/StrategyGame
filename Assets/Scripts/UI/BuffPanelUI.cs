@@ -14,7 +14,6 @@ public class BuffPanelUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
     public void SetBuff(Buff buff)
     {
-        if (!TurnSystem.Instance.IsPlayerTurn) return;
         _buff = buff;
         _name.text = buff.Name;
     }

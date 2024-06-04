@@ -21,7 +21,8 @@ public class UnitAnimator : MonoBehaviour
             moveAction.OnStopMoving += MoveAction_OnStopMoving;
         }
 
-        if (TryGetComponent(out ShootAction shootAction))
+        var shootActions = GetComponents<ShootAction>();
+        foreach (var shootAction in shootActions)
         {
             shootAction.OnShoot += ShootAction_OnShoot;
         }
@@ -29,6 +30,11 @@ public class UnitAnimator : MonoBehaviour
         if (TryGetComponent(out GrenadeAction grenadeAction))
         {
             grenadeAction.OnThrow += GrenadeAction_OnThrow;
+        }
+
+        if (TryGetComponent(out IceBoltAction iceBoltAction))
+        {
+            iceBoltAction.OnThrow += IceBoltAction_OnThrow;
         }
 
         var swordActions = GetComponents<SwordAction>();
@@ -43,6 +49,15 @@ public class UnitAnimator : MonoBehaviour
         //     swordAction.OnSwordActionStarted += SwordAction_OnSwordActionStarted;
         //     swordAction.OnSwordActionCompleted += SwordAction_OnSwordActionCompleted;
         // }
+    }
+
+    private void IceBoltAction_OnThrow(object sender, IceBoltAction.OnThrowEventArgs e)
+    {
+        var grenadeTransform = Instantiate(_grenadeProjectilePrefab, transform.position, Quaternion.identity);
+        var grenade = grenadeTransform.GetComponent<GrenadeProjectile>();
+        var targetUnitGridPosition = e.targetGridPosition;
+        grenade.Setup(targetUnitGridPosition,
+            e.onHitAffectAction);
     }
 
     private void Start()
