@@ -4,17 +4,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-public class GrenadeAction : BaseAction
+public class IceBoltAction : BaseAction
 {
     protected override int GetActionRange() => 4;
-    protected override bool CanBeUsedOnInteractableObjects() => true;
-    protected override bool CanBeUsedOnEmpty() => true;
-    protected override bool CanBeUsedOnOneself() => true;
-    protected override bool CanBeUsedOnAllies() => true;
+    protected override bool CanBeUsedOnAllies() => false;
     protected override bool CanBeUsedOnEnemies() => true;
+    protected override float GetModifier() => 0.8f;
     public event EventHandler<OnThrowEventArgs> OnThrow;
-    protected override int GetTargetRange() => 1;
     private bool _canThrow = true;
+    private int _slowDownAmount = 1;
+    private int _effectDuration = 2;
 
     public class OnThrowEventArgs : EventArgs
     {
@@ -26,7 +25,7 @@ public class GrenadeAction : BaseAction
         public Action<GridPosition> onHitAffectAction;
     }
 
-    public override string GetName() => "Grenade";
+    public override string GetName() => "Ice Bolt";
 
     // private float _stateTimer;
     // private State _state;
@@ -70,14 +69,15 @@ public class GrenadeAction : BaseAction
     protected override void AffectGridPosition(GridPosition targetGridPosition)
     {
         var unit = LevelGrid.Instance.GetUnitAtGridPosition(targetGridPosition);
-        var desctructible = LevelGrid.Instance.GetDestructibleAtGridPosition(targetGridPosition);
-        if (unit is not null) unit.TakeDamage(GetFinalDamage(Unit.MagicAttack, unit.Defense));
-        if (desctructible is not null) desctructible.Destruct();
+        if (unit is not null)
+        {
+            unit.TakeDamage(GetFinalDamage(Unit.MagicAttack, unit.Defense));
+            unit.AddBuff(new Buff(CharacteristicType.Speed, -_slowDownAmount, _effectDuration, GetName(), "Slowed down by 1"));
+        }
     }
 
     public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
     {
-        // var targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
         return new EnemyAIAction
         {
             gridPosition = gridPosition,
@@ -88,7 +88,5 @@ public class GrenadeAction : BaseAction
     public override int GetCooldown() => 2;
 
     public override GridColorEnum GetColor() => GridColorEnum.Red;
-
-    // protected override float GetModifier() => 0.6f;
-    public override string GetDescription() => "Deal MAG to all units in range";
+    public override string GetDescription() => "Deal MAG and slow down enemy";
 }

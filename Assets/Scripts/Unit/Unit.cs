@@ -68,7 +68,7 @@ public class Unit : MonoBehaviour
 
     private void TurnSystem_OnTurnChanged(object sender, TurnSystem.OnTurnChangedEventArgs e)
     {
-        if ((IsEnemy && !e.isPlayerTurn) || (!IsEnemy && e.isPlayerTurn))
+        if (IsEnemy != e.isPlayerTurn)
         {
             ResetPoints();
         }

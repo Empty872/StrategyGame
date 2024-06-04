@@ -23,7 +23,6 @@ public class MoveAction : BaseAction
     private float _rotationSpeed = 10f;
 
 
-
     private void Update()
     {
         if (!IsActive) return;
@@ -45,9 +44,53 @@ public class MoveAction : BaseAction
             }
         }
     }
+
     protected override void AffectGridPosition(GridPosition gridPosition)
     {
         return;
+    }
+
+    public override List<GridPosition> GetReachableActionGridPositionList()
+    {
+        var reachableGridPositionList = new List<GridPosition>();
+        var unitGridPosition = Unit.GridPosition;
+
+        for (int x = -GetActionRange(); x <= GetActionRange(); x++)
+        {
+            for (int z = -GetActionRange(); z <= GetActionRange(); z++)
+            {
+                var offsetGridPosition = new GridPosition(x, z);
+                var possibleGridPosition = unitGridPosition + offsetGridPosition;
+                if (!LevelGrid.Instance.IsValidGridPosition(possibleGridPosition))
+                {
+                    continue;
+                }
+
+
+                var possibleDistance = Mathf.Abs(x) + Mathf.Abs(z);
+                if (possibleDistance > GetActionRange()) continue;
+                if (Unit.GridPosition == possibleGridPosition)
+                {
+                    // Same Grid Position where the unit is already at
+                    continue;
+                }
+
+                if (LevelGrid.Instance.HasAnyUnitOnGridPosition(possibleGridPosition))
+                {
+                    // Grid Position already occupied with another Unit
+                    continue;
+                }
+
+                // if (!Pathfinding.Instance.IsWalkableGridPosition(possibleGridPosition)) continue;
+                if (!Pathfinding.Instance.HasPath(unitGridPosition, possibleGridPosition)) continue;
+                var pathfindDistanceMultiplier = 10;
+                if (Pathfinding.Instance.GetPathLength(unitGridPosition, possibleGridPosition) >
+                    GetActionRange() * pathfindDistanceMultiplier) continue;
+                reachableGridPositionList.Add(possibleGridPosition);
+            }
+        }
+
+        return reachableGridPositionList;
     }
 
     public override void TakeAction(GridPosition targetGridPosition, Action actionOnComplete)
@@ -60,6 +103,7 @@ public class MoveAction : BaseAction
         {
             _targetPositionList.Add(LevelGrid.Instance.GetWorldPosition(pathGridPosition));
         }
+
         StartAction(actionOnComplete);
         Unit.SpendMovementPoints(GridPosition.GetDistance(targetGridPosition, Unit.GridPosition));
     }
