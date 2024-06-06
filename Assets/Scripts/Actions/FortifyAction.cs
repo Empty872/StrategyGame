@@ -20,19 +20,14 @@ public class FortifyAction : BaseAction
     {
         RiseDefense();
     }
-
-
+    private void Update()
+    {
+        UpdateFriendlyCast();
+    }
     public override void TakeAction(GridPosition gridPosition, Action actionOnComplete)
     {
-        StartAction(actionOnComplete);
-        StartFriendlyAction(this, gridPosition, PerformAction);
-        // PerformAction(Unit.GridPosition);
-        // CompleteAction();
-    }
-    protected override void PerformAction(GridPosition targetGridPosition)
-    {
-        base.PerformAction(targetGridPosition);
-        Invoke(nameof(CompleteAction), UnitAnimator.FriendlySpellCastAnimationTime);
+        TakeFriendlyCastAction(gridPosition);
+        StartFriendlyCastAction(this, gridPosition, actionOnComplete);
     }
 
 

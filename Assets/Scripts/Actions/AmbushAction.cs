@@ -12,6 +12,11 @@ public class AmbushAction : BaseAction
     protected override bool CanBeUsedOnEnemies() => false;
     private int _effectDuration = 2;
 
+    private void Update()
+    {
+        UpdateFriendlyCast();
+    }
+
 
     protected override void AffectGridPosition(GridPosition gridPosition)
     {
@@ -22,10 +27,8 @@ public class AmbushAction : BaseAction
 
     public override void TakeAction(GridPosition gridPosition, Action actionOnComplete)
     {
-        StartAction(actionOnComplete);
-        StartFriendlyAction(this, gridPosition, PerformAction);
-        // PerformAction(Unit.GridPosition);
-        // CompleteAction();
+        TakeFriendlyCastAction(gridPosition);
+        StartFriendlyCastAction(this, gridPosition, actionOnComplete);
     }
 
     public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
@@ -37,11 +40,6 @@ public class AmbushAction : BaseAction
         };
     }
 
-    protected override void PerformAction(GridPosition targetGridPosition)
-    {
-        base.PerformAction(targetGridPosition);
-        Invoke(nameof(CompleteAction), UnitAnimator.FriendlySpellCastAnimationTime);
-    }
 
     public override GridColorEnum GetColor() => GridColorEnum.Green;
 

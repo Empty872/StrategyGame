@@ -24,12 +24,14 @@ public class PrayerAction : BaseAction
             "Magic increased by " + _extraMagic));
     }
 
-
+    private void Update()
+    {
+        UpdateFriendlyCast();
+    }
     public override void TakeAction(GridPosition gridPosition, Action actionOnComplete)
     {
-        StartAction(actionOnComplete);
-        PerformAction(Unit.GridPosition);
-        CompleteAction();
+        TakeFriendlyCastAction(gridPosition);
+        StartFriendlyCastAction(this, gridPosition, actionOnComplete);
     }
 
 

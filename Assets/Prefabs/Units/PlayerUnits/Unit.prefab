@@ -367,6 +367,12 @@ MonoBehaviour:
   _rifle: {fileID: 3283574995980990454}
   _sword: {fileID: 2977092161671277764}
   _spellPoint: {fileID: 3778419588608218795}
+  _buffVfx: {fileID: 1405456010648457161, guid: 4da2f5ef4ba44254a8e63f1517c2fa9d,
+    type: 3}
+  _debuffVfx: {fileID: 6591816663385553855, guid: a955a7b8c0e22bf469c74308073b3927,
+    type: 3}
+  _healVfx: {fileID: 1154607210582540102, guid: fe10deed25374684bbb3494a8aae9cc0,
+    type: 3}
 --- !u!114 &434836626308453898
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -82,6 +82,7 @@ public class SwordAction : BaseAction
         TargetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
         _state = State.SwingingBeforeHit;
         _stateTimer = _beforeHitTime;
+        TargetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
         OnSwordActionStarted?.Invoke(this, EventArgs.Empty);
         StartAction(actionOnComplete);
     }

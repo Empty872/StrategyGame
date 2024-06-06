@@ -9,14 +9,15 @@ public abstract class BaseAction : MonoBehaviour
     public static event EventHandler OnAnyActionStarted;
     public static event EventHandler OnAnyActionCompleted;
     public event EventHandler<OnFriendlyActionEventArgs> OnFriendlyActionStarted;
+    public GridPosition TargetGridPosition { get; protected set; }
 
-    protected void StartFriendlyAction(BaseAction action, GridPosition targetGridPosition,
-        Action<GridPosition> onCastAffectAction)
+    protected void StartFriendlyCastAction(BaseAction baseAction, GridPosition targetGridPosition, Action actionOnComplete)
     {
-        OnFriendlyActionStarted?.Invoke(action, new OnFriendlyActionEventArgs()
+        OnFriendlyActionStarted?.Invoke(baseAction, new OnFriendlyActionEventArgs()
         {
-            targetGridPosition = targetGridPosition, actionOnCastFinished = onCastAffectAction
+            targetGridPosition = targetGridPosition
         });
+        StartAction(actionOnComplete);
     }
 
     public Unit Unit { get; private set; }
@@ -26,6 +27,10 @@ public abstract class BaseAction : MonoBehaviour
     private int _cooldown;
     private int _currentCooldown;
     public int CurrentCooldown => _currentCooldown;
+    private float _stateTimer;
+    private FriendlyCastState _state;
+    private float _timeToPerform = 1.5f;
+    private float _timeToComplete = 1.5f;
 
     public class OnHostileBaseActionEventArgs : EventArgs
     {
@@ -38,7 +43,6 @@ public abstract class BaseAction : MonoBehaviour
     public class OnFriendlyActionEventArgs : EventArgs
     {
         public GridPosition targetGridPosition;
-        public Action<GridPosition> actionOnCastFinished;
     }
 
     protected virtual void Awake()
@@ -46,9 +50,50 @@ public abstract class BaseAction : MonoBehaviour
         Unit = GetComponent<Unit>();
     }
 
+    protected void TakeFriendlyCastAction(GridPosition gridPosition)
+    {
+        _stateTimer = _timeToPerform;
+        TargetGridPosition = gridPosition;
+    }
+
+
     private void Start()
     {
         TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
+    }
+
+
+    // private GridPosition _targetGridPosition;
+
+    private enum FriendlyCastState
+    {
+        BeforePerform,
+        AfterPerform,
+    }
+
+    protected void UpdateFriendlyCast()
+    {
+        if (!IsActive) return;
+        _stateTimer -= Time.deltaTime;
+        if (_stateTimer <= 0)
+        {
+            NextState();
+        }
+    }
+
+    private void NextState()
+    {
+        switch (_state)
+        {
+            case FriendlyCastState.BeforePerform:
+                PerformAction(TargetGridPosition);
+                _state = FriendlyCastState.AfterPerform;
+                _stateTimer = _timeToComplete;
+                break;
+            case FriendlyCastState.AfterPerform:
+                CompleteAction();
+                break;
+        }
     }
 
     private void TurnSystem_OnTurnChanged(object sender, TurnSystem.OnTurnChangedEventArgs e)
@@ -59,6 +104,7 @@ public abstract class BaseAction : MonoBehaviour
     protected void StartAction(Action action)
     {
         if (!CanBeUsed()) return;
+        _state = FriendlyCastState.BeforePerform;
         IsActive = true;
         OnActionComplete = action;
         ActivateCooldown();
@@ -68,7 +114,7 @@ public abstract class BaseAction : MonoBehaviour
     protected void CompleteAction()
     {
         IsActive = false;
-        OnActionComplete.Invoke();
+        OnActionComplete?.Invoke();
         TryUnselectAction();
         OnAnyActionCompleted?.Invoke(this, EventArgs.Empty);
     }
@@ -185,7 +231,6 @@ public abstract class BaseAction : MonoBehaviour
         }
 
         if (enemyAIActionList.Count == 0) return null;
-        // Debug.Log(enemyAIActionList.Count);
         enemyAIActionList = enemyAIActionList.OrderByDescending(element => element.actionPriority).ToList();
         return enemyAIActionList[0];
     }
