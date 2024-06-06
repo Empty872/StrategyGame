@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7909761641022677442}
   - component: {fileID: 908180764668345357}
   m_Layer: 0
-  m_Name: GrenadeExplosionVfx
+  m_Name: FireballExplosionVfx
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

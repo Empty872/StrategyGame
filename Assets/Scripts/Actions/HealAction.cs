@@ -29,8 +29,12 @@ public class HealAction : BaseAction
     {
         TargetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
         StartAction(actionOnComplete);
-        PerformAction(gridPosition);
-        CompleteAction();
+        StartFriendlyAction(this, gridPosition, PerformAction);
+    }
+    protected override void PerformAction(GridPosition targetGridPosition)
+    {
+        base.PerformAction(targetGridPosition);
+        Invoke(nameof(CompleteAction), UnitAnimator.FriendlySpellCastAnimationTime);
     }
 
 

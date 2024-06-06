@@ -92,6 +92,37 @@ MonoBehaviour:
   m_EffectColor: {r: 0, g: 0, b: 0, a: 1}
   m_EffectDistance: {x: 0.05, y: 0.05}
   m_UseGraphicAlpha: 1
+--- !u!1 &1636145313177514989
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3778419588608218795}
+  m_Layer: 7
+  m_Name: SpellPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3778419588608218795
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1636145313177514989}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 8.100014, y: 9.4, z: 0.000002713874}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3286144576123876017}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1721361694963674770
 GameObject:
   m_ObjectHideFlags: 0
@@ -328,11 +359,14 @@ MonoBehaviour:
   _animator: {fileID: 8216708443779741157}
   _bulletProjectilePrefab: {fileID: 3933139509609285601, guid: 7b6c26c310c56b341b92d7d1a9c9c5a3,
     type: 3}
-  _grenadeProjectilePrefab: {fileID: 6169583733437232208, guid: 65675d300b5286c478a7e5a1725149d2,
+  _fireballProjectilePrefab: {fileID: 7276033599785305660, guid: a92b1088b1848d24ebbf77e4fbf6d5ba,
+    type: 3}
+  _iceBoltProjectilePrefab: {fileID: 2516259665009940740, guid: 7d207defbcf576e419db6b286a15f94b,
     type: 3}
   _shootPointTransform: {fileID: 2242445835516472272}
   _rifle: {fileID: 3283574995980990454}
   _sword: {fileID: 2977092161671277764}
+  _spellPoint: {fileID: 3778419588608218795}
 --- !u!114 &434836626308453898
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1479,6 +1513,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 2979573282663435248}
+    - targetCorrespondingSourceObject: {fileID: 4471465929434822, guid: 8dbb22b9d53a7664b8619d4c6888d92f,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3778419588608218795}
   m_SourcePrefab: {fileID: 100100000, guid: 8dbb22b9d53a7664b8619d4c6888d92f, type: 3}
 --- !u!4 &3279983927377618671 stripped
 Transform:

@@ -8,6 +8,17 @@ public abstract class BaseAction : MonoBehaviour
 {
     public static event EventHandler OnAnyActionStarted;
     public static event EventHandler OnAnyActionCompleted;
+    public event EventHandler<OnFriendlyActionEventArgs> OnFriendlyActionStarted;
+
+    protected void StartFriendlyAction(BaseAction action, GridPosition targetGridPosition,
+        Action<GridPosition> onCastAffectAction)
+    {
+        OnFriendlyActionStarted?.Invoke(action, new OnFriendlyActionEventArgs()
+        {
+            targetGridPosition = targetGridPosition, actionOnCastFinished = onCastAffectAction
+        });
+    }
+
     public Unit Unit { get; private set; }
     protected bool IsActive { get; private set; }
 
@@ -15,6 +26,20 @@ public abstract class BaseAction : MonoBehaviour
     private int _cooldown;
     private int _currentCooldown;
     public int CurrentCooldown => _currentCooldown;
+
+    public class OnHostileBaseActionEventArgs : EventArgs
+    {
+        public GridPosition targetGridPosition;
+        public Unit unit;
+        public Unit targetUnit;
+        public Action<GridPosition> actionOnCastFinished;
+    }
+
+    public class OnFriendlyActionEventArgs : EventArgs
+    {
+        public GridPosition targetGridPosition;
+        public Action<GridPosition> actionOnCastFinished;
+    }
 
     protected virtual void Awake()
     {

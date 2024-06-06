@@ -23,8 +23,9 @@ public class AmbushAction : BaseAction
     public override void TakeAction(GridPosition gridPosition, Action actionOnComplete)
     {
         StartAction(actionOnComplete);
-        PerformAction(Unit.GridPosition);
-        CompleteAction();
+        StartFriendlyAction(this, gridPosition, PerformAction);
+        // PerformAction(Unit.GridPosition);
+        // CompleteAction();
     }
 
     public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
@@ -34,6 +35,12 @@ public class AmbushAction : BaseAction
             gridPosition = gridPosition,
             actionPriority = 0
         };
+    }
+
+    protected override void PerformAction(GridPosition targetGridPosition)
+    {
+        base.PerformAction(targetGridPosition);
+        Invoke(nameof(CompleteAction), UnitAnimator.FriendlySpellCastAnimationTime);
     }
 
     public override GridColorEnum GetColor() => GridColorEnum.Green;

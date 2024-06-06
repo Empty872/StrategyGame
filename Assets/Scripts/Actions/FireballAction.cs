@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-public class GrenadeAction : BaseAction
+public class FireballAction : BaseAction
 {
     protected override int GetActionRange() => 4;
     protected override bool CanBeUsedOnInteractableObjects() => true;
@@ -12,19 +12,19 @@ public class GrenadeAction : BaseAction
     protected override bool CanBeUsedOnOneself() => true;
     protected override bool CanBeUsedOnAllies() => true;
     protected override bool CanBeUsedOnEnemies() => true;
-    public event EventHandler<OnThrowEventArgs> OnThrow;
+    public event EventHandler<OnHostileBaseActionEventArgs> OnThrow;
     protected override int GetTargetRange() => 1;
     private bool _canThrow = true;
 
-    public class OnThrowEventArgs : EventArgs
-    {
-        public GridPosition targetGridPosition;
-
-        public Unit shootingUnit;
-
-        // public List<GridPosition> affectedGridPositions;
-        public Action<GridPosition> onHitAffectAction;
-    }
+    // public class OnThrowEventArgs : EventArgs
+    // {
+    //     public GridPosition targetGridPosition;
+    //
+    //     public Unit shootingUnit;
+    //
+    //     // public List<GridPosition> affectedGridPositions;
+    //     public Action<GridPosition> onHitAffectAction;
+    // }
 
     public override string GetName() => "Grenade";
 
@@ -58,11 +58,11 @@ public class GrenadeAction : BaseAction
     private void Throw()
     {
         OnThrow?.Invoke(this,
-            new OnThrowEventArgs
+            new OnHostileBaseActionEventArgs()
             {
-                targetGridPosition = TargetGridPosition, shootingUnit = Unit,
+                targetGridPosition = TargetGridPosition, unit = Unit,
                 // affectedGridPositions = affectedGridPositionList, 
-                onHitAffectAction = PerformAction
+                actionOnCastFinished = PerformAction
             });
         _canThrow = false;
     }

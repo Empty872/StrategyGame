@@ -7,14 +7,9 @@ public class ShootAction : BaseAction
 {
     protected override int GetActionRange() => 3;
 
-    public static event EventHandler<OnShootEventArgs> OnAnyShoot;
-    public event EventHandler<OnShootEventArgs> OnShoot;
+    public static event EventHandler<OnHostileBaseActionEventArgs> OnAnyShoot;
+    public event EventHandler<OnHostileBaseActionEventArgs> OnShoot;
 
-    public class OnShootEventArgs : EventArgs
-    {
-        public Unit targetUnit;
-        public Unit shootingUnit;
-    }
     
 
     public override string GetName() => "Shoot";
@@ -100,8 +95,8 @@ public class ShootAction : BaseAction
     private void Shoot()
     {
         TargetUnit.TakeDamage(GetFinalDamage(Unit.Attack, TargetUnit.Defense));
-        OnShoot?.Invoke(this, new OnShootEventArgs { targetUnit = TargetUnit, shootingUnit = Unit });
-        OnAnyShoot?.Invoke(this, new OnShootEventArgs { targetUnit = TargetUnit, shootingUnit = Unit });
+        OnShoot?.Invoke(this, new OnHostileBaseActionEventArgs { targetUnit = TargetUnit, unit = Unit });
+        OnAnyShoot?.Invoke(this, new OnHostileBaseActionEventArgs { targetUnit = TargetUnit, unit = Unit });
     }
 
     public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
