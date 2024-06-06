@@ -26,7 +26,7 @@ public class FireballAction : BaseAction
     //     public Action<GridPosition> onHitAffectAction;
     // }
 
-    public override string GetName() => "Grenade";
+    public override string GetName() => "Fireball";
 
     // private float _stateTimer;
     // private State _state;

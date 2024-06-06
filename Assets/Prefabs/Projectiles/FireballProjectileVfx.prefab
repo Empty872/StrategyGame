@@ -9647,7 +9647,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7276033599785305660}
-  - component: {fileID: -5066872510666150506}
+  - component: {fileID: 8087145324655740095}
   m_Layer: 0
   m_Name: FireballProjectileVfx
   m_TagString: Untagged
@@ -9672,7 +9672,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &-5066872510666150506
+--- !u!114 &8087145324655740095
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -9681,51 +9681,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 7276033599785305659}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d604c8e16d1b6454bb5d4492f99653cf, type: 3}
+  m_Script: {fileID: 11500000, guid: 59b0bcb19a4c283409a5373bf1cbe68a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _bulletHitVfxPrefab: {fileID: 3108613952624452008, guid: 9a218edacac2d264389c84c30c6fea85,
+  _hitVfxPrefab: {fileID: 3108613952624452008, guid: 9a218edacac2d264389c84c30c6fea85,
     type: 3}
-  _trail: {fileID: 3327964486653385804, guid: 65675d300b5286c478a7e5a1725149d2, type: 3}
-  _arcYAnimationCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0.6
-      inSlope: 1.6544952
-      outSlope: 1.6544952
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.20549658
-      value: 0.93999314
-      inSlope: 0.8258835
-      outSlope: 0.8258835
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.18420006
-      outWeight: 0.08831671
-    - serializedVersion: 3
-      time: 0.9532785
-      value: 0.11756485
-      inSlope: -2.7686203
-      outSlope: -2.7686203
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.061572753
-      outWeight: 0.6457071
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: -2.5162892
-      outSlope: -2.5162892
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4

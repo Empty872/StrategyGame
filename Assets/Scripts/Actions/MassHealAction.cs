@@ -12,16 +12,14 @@ public class MassHealAction : BaseAction
     protected override float GetModifier() => 0.3f;
     private int _maxActionDistance = 1;
 
-
+    private void Update()
+    {
+        UpdateFriendlyCast();
+    }
     public override void TakeAction(GridPosition gridPosition, Action actionOnComplete)
     {
-        StartAction(actionOnComplete);
-        StartFriendlyAction(this, gridPosition, PerformAction);
-    }
-    protected override void PerformAction(GridPosition targetGridPosition)
-    {
-        base.PerformAction(targetGridPosition);
-        Invoke(nameof(CompleteAction), UnitAnimator.FriendlySpellCastAnimationTime);
+        TakeFriendlyCastAction(gridPosition);
+        StartFriendlyCastAction(this, gridPosition, actionOnComplete);
     }
 
 

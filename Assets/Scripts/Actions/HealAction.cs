@@ -25,16 +25,16 @@ public class HealAction : BaseAction
     }
 // изза кулдауна перс не может окончить действие        
 
+    private void Update()
+    {
+        UpdateFriendlyCast();
+    }
+
     public override void TakeAction(GridPosition gridPosition, Action actionOnComplete)
     {
         TargetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
-        StartAction(actionOnComplete);
-        StartFriendlyAction(this, gridPosition, PerformAction);
-    }
-    protected override void PerformAction(GridPosition targetGridPosition)
-    {
-        base.PerformAction(targetGridPosition);
-        Invoke(nameof(CompleteAction), UnitAnimator.FriendlySpellCastAnimationTime);
+        TakeFriendlyCastAction(gridPosition);
+        StartFriendlyCastAction(this, gridPosition, actionOnComplete);
     }
 
 

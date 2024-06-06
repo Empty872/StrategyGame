@@ -15,11 +15,14 @@ public class UnitAnimator : MonoBehaviour
     [SerializeField] private GameObject _rifle;
     [SerializeField] private GameObject _sword;
     [SerializeField] private Transform _spellPoint;
-    public const float FriendlySpellCastAnimationTime = 3f;
+    [SerializeField] private Transform _buffVfx;
+    [SerializeField] private Transform _debuffVfx;
+    [SerializeField] private Transform _healVfx;
 
 
     private void Awake()
     {
+        var unit = GetComponent<Unit>();
         if (TryGetComponent(out MoveAction moveAction))
         {
             moveAction.OnStartMoving += MoveAction_OnStartMoving;
@@ -53,14 +56,24 @@ public class UnitAnimator : MonoBehaviour
         foreach (var swordAction in swordActions)
         {
             swordAction.OnSwordActionStarted += SwordAction_OnSwordActionStarted;
-            // swordAction.OnSwordActionCompleted += SwordAction_OnSwordActionCompleted;
         }
+
         BaseAction.OnAnyActionCompleted += BaseAction_OnAnyActionCompleted;
-        // if (TryGetComponent(out SwordAction swordAction))
-        // {
-        //     swordAction.OnSwordActionStarted += SwordAction_OnSwordActionStarted;
-        //     swordAction.OnSwordActionCompleted += SwordAction_OnSwordActionCompleted;
-        // }
+        unit.OnBuffObtained += Unit_OnBuffObtained;
+        unit.OnHealthRestored += Unit_OnHealthRestored;
+    }
+
+    private void Unit_OnHealthRestored(object sender, EventArgs e)
+    {
+        Instantiate(_healVfx, transform.position, Quaternion.identity);
+    }
+
+    private void Unit_OnBuffObtained(object sender, Unit.BuffEventArgs e)
+    {
+        var buffValue = e.buff.Value;
+        if (buffValue == 0) return;
+        var vfx = buffValue > 0 ? _buffVfx : _debuffVfx;
+        Instantiate(vfx, transform.position, vfx.rotation);
     }
 
     private void BaseAction_OnAnyActionCompleted(object sender, EventArgs e)
@@ -74,7 +87,7 @@ public class UnitAnimator : MonoBehaviour
         var targetPosition = LevelGrid.Instance.GetWorldPosition(e.targetGridPosition);
         transform.LookAt(targetPosition);
         _animator.SetTrigger("CastFriendlySpell");
-        e.actionOnCastFinished?.Invoke(e.targetGridPosition);
+        // e.actionOnCastFinished?.Invoke(e.targetGridPosition);
     }
 
     private void IceBoltAction_OnThrow(object sender, BaseAction.OnHostileBaseActionEventArgs e)
@@ -85,7 +98,7 @@ public class UnitAnimator : MonoBehaviour
         _animator.SetTrigger("CastAttackSpell");
         var iceBoltTransform = Instantiate(_iceBoltProjectilePrefab, _spellPoint.position, _spellPoint.rotation);
         iceBoltTransform.parent = _spellPoint;
-        var iceBolt = iceBoltTransform.GetComponent<IceBoltProjectile>();
+        var iceBolt = iceBoltTransform.GetComponent<AttackSpellProjectile>();
         var targetUnitGridPosition = e.targetGridPosition;
         iceBolt.Setup(targetUnitGridPosition,
             e.actionOnCastFinished);
@@ -106,9 +119,11 @@ public class UnitAnimator : MonoBehaviour
     {
         EquipNothing();
         _animator.SetTrigger("CastAttackSpell");
+        var targetPosition = LevelGrid.Instance.GetWorldPosition(e.targetGridPosition);
+        transform.LookAt(targetPosition);
         var fireballTransform = Instantiate(_fireballProjectilePrefab, _spellPoint.position, _spellPoint.rotation);
         fireballTransform.parent = _spellPoint;
-        var fireball = fireballTransform.GetComponent<FireballProjectile>();
+        var fireball = fireballTransform.GetComponent<AttackSpellProjectile>();
         var targetUnitGridPosition = e.targetGridPosition;
         fireball.Setup(targetUnitGridPosition,
             e.actionOnCastFinished);

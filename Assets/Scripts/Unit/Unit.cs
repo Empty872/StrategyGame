@@ -24,12 +24,19 @@ public class Unit : MonoBehaviour
     public static event EventHandler OnAnyActionPointsChanged;
     public static event EventHandler<UnitGridPositionEventArgs> OnAnyUnitDied;
     public static event EventHandler OnAnyUnitSpawned;
+    public event EventHandler OnHealthRestored;
+    public event EventHandler<BuffEventArgs> OnBuffObtained;
     public int Attack => _unitCharacteristic.Attack;
     public int Defense => _unitCharacteristic.Defense;
     public int MagicAttack => _unitCharacteristic.MagicAttack;
     public int Speed => _unitCharacteristic.Speed;
     public int Health => _healthSystem.Health;
     public int MaxHealth => _healthSystem.MaxHealth;
+
+    public class BuffEventArgs : EventArgs
+    {
+        public Buff buff;
+    }
 
     public class UnitGridPositionEventArgs : EventArgs
     {
@@ -128,6 +135,7 @@ public class Unit : MonoBehaviour
     public void RestoreHealth(int count)
     {
         _healthSystem.RestoreHealth(count);
+        OnHealthRestored?.Invoke(this, EventArgs.Empty);
     }
 
     private void Die()
@@ -157,5 +165,6 @@ public class Unit : MonoBehaviour
     public void AddBuff(Buff buff)
     {
         _buffSystem.AddBuff(buff);
+        OnBuffObtained?.Invoke(this, new BuffEventArgs() { buff = buff });
     }
 }
