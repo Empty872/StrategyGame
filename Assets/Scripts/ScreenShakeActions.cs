@@ -8,7 +8,7 @@ public class ScreenShakeActions : MonoBehaviour
     private void Start()
     {
         ShootAction.OnAnyShoot += ShootAction_OnAnyShoot;
-        GrenadeProjectile.OnAnyExplosion += GrenadeProjectile_OnAnyExplosion;
+        FireballProjectile.OnAnyExplosion += GrenadeProjectile_OnAnyExplosion;
         SwordAction.OnAnyAttack += SwordAction_OnAnyAttack;
     }
 

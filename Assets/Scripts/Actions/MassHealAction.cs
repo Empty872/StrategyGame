@@ -16,8 +16,12 @@ public class MassHealAction : BaseAction
     public override void TakeAction(GridPosition gridPosition, Action actionOnComplete)
     {
         StartAction(actionOnComplete);
-        PerformAction(Unit.GridPosition);
-        CompleteAction();
+        StartFriendlyAction(this, gridPosition, PerformAction);
+    }
+    protected override void PerformAction(GridPosition targetGridPosition)
+    {
+        base.PerformAction(targetGridPosition);
+        Invoke(nameof(CompleteAction), UnitAnimator.FriendlySpellCastAnimationTime);
     }
 
 

@@ -10,20 +10,10 @@ public class IceBoltAction : BaseAction
     protected override bool CanBeUsedOnAllies() => false;
     protected override bool CanBeUsedOnEnemies() => true;
     protected override float GetModifier() => 0.8f;
-    public event EventHandler<OnThrowEventArgs> OnThrow;
+    public event EventHandler<OnHostileBaseActionEventArgs> OnThrow;
     private bool _canThrow = true;
     private int _slowDownAmount = 1;
     private int _effectDuration = 2;
-
-    public class OnThrowEventArgs : EventArgs
-    {
-        public GridPosition targetGridPosition;
-
-        public Unit shootingUnit;
-
-        // public List<GridPosition> affectedGridPositions;
-        public Action<GridPosition> onHitAffectAction;
-    }
 
     public override string GetName() => "Ice Bolt";
 
@@ -57,11 +47,11 @@ public class IceBoltAction : BaseAction
     private void Throw()
     {
         OnThrow?.Invoke(this,
-            new OnThrowEventArgs
+            new OnHostileBaseActionEventArgs
             {
-                targetGridPosition = TargetGridPosition, shootingUnit = Unit,
+                targetGridPosition = TargetGridPosition, unit = Unit,
                 // affectedGridPositions = affectedGridPositionList, 
-                onHitAffectAction = PerformAction
+                actionOnCastFinished = PerformAction
             });
         _canThrow = false;
     }

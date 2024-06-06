@@ -1,16 +1,21 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class UnitAnimator : MonoBehaviour
 {
     [SerializeField] private Animator _animator;
     [SerializeField] private Transform _bulletProjectilePrefab;
-    [SerializeField] private Transform _grenadeProjectilePrefab;
+    [SerializeField] private Transform _fireballProjectilePrefab;
+    [SerializeField] private Transform _iceBoltProjectilePrefab;
     [SerializeField] private Transform _shootPointTransform;
     [SerializeField] private GameObject _rifle;
     [SerializeField] private GameObject _sword;
+    [SerializeField] private Transform _spellPoint;
+    public const float FriendlySpellCastAnimationTime = 3f;
 
 
     private void Awake()
@@ -27,9 +32,9 @@ public class UnitAnimator : MonoBehaviour
             shootAction.OnShoot += ShootAction_OnShoot;
         }
 
-        if (TryGetComponent(out GrenadeAction grenadeAction))
+        if (TryGetComponent(out FireballAction fireballAction))
         {
-            grenadeAction.OnThrow += GrenadeAction_OnThrow;
+            fireballAction.OnThrow += FireballAction_OnThrow;
         }
 
         if (TryGetComponent(out IceBoltAction iceBoltAction))
@@ -37,13 +42,20 @@ public class UnitAnimator : MonoBehaviour
             iceBoltAction.OnThrow += IceBoltAction_OnThrow;
         }
 
+        var baseActions = GetComponents<BaseAction>();
+        foreach (var baseAction in baseActions)
+        {
+            baseAction.OnFriendlyActionStarted += BaseAction_OnFriendlyActionStarted;
+        }
+
+
         var swordActions = GetComponents<SwordAction>();
         foreach (var swordAction in swordActions)
         {
             swordAction.OnSwordActionStarted += SwordAction_OnSwordActionStarted;
-            swordAction.OnSwordActionCompleted += SwordAction_OnSwordActionCompleted;
+            // swordAction.OnSwordActionCompleted += SwordAction_OnSwordActionCompleted;
         }
-
+        BaseAction.OnAnyActionCompleted += BaseAction_OnAnyActionCompleted;
         // if (TryGetComponent(out SwordAction swordAction))
         // {
         //     swordAction.OnSwordActionStarted += SwordAction_OnSwordActionStarted;
@@ -51,13 +63,32 @@ public class UnitAnimator : MonoBehaviour
         // }
     }
 
-    private void IceBoltAction_OnThrow(object sender, IceBoltAction.OnThrowEventArgs e)
+    private void BaseAction_OnAnyActionCompleted(object sender, EventArgs e)
     {
-        var grenadeTransform = Instantiate(_grenadeProjectilePrefab, transform.position, Quaternion.identity);
-        var grenade = grenadeTransform.GetComponent<GrenadeProjectile>();
+        EquipRifle();
+    }
+
+    private void BaseAction_OnFriendlyActionStarted(object sender, BaseAction.OnFriendlyActionEventArgs e)
+    {
+        EquipNothing();
+        var targetPosition = LevelGrid.Instance.GetWorldPosition(e.targetGridPosition);
+        transform.LookAt(targetPosition);
+        _animator.SetTrigger("CastFriendlySpell");
+        e.actionOnCastFinished?.Invoke(e.targetGridPosition);
+    }
+
+    private void IceBoltAction_OnThrow(object sender, BaseAction.OnHostileBaseActionEventArgs e)
+    {
+        EquipNothing();
+        var targetPosition = LevelGrid.Instance.GetWorldPosition(e.targetGridPosition);
+        transform.LookAt(targetPosition);
+        _animator.SetTrigger("CastAttackSpell");
+        var iceBoltTransform = Instantiate(_iceBoltProjectilePrefab, _spellPoint.position, _spellPoint.rotation);
+        iceBoltTransform.parent = _spellPoint;
+        var iceBolt = iceBoltTransform.GetComponent<IceBoltProjectile>();
         var targetUnitGridPosition = e.targetGridPosition;
-        grenade.Setup(targetUnitGridPosition,
-            e.onHitAffectAction);
+        iceBolt.Setup(targetUnitGridPosition,
+            e.actionOnCastFinished);
     }
 
     private void Start()
@@ -71,18 +102,16 @@ public class UnitAnimator : MonoBehaviour
         _animator.SetTrigger("SwordSlash");
     }
 
-    private void SwordAction_OnSwordActionCompleted(object sender, EventArgs e)
+    private void FireballAction_OnThrow(object sender, BaseAction.OnHostileBaseActionEventArgs e)
     {
-        EquipRifle();
-    }
-
-    private void GrenadeAction_OnThrow(object sender, GrenadeAction.OnThrowEventArgs e)
-    {
-        var grenadeTransform = Instantiate(_grenadeProjectilePrefab, transform.position, Quaternion.identity);
-        var grenade = grenadeTransform.GetComponent<GrenadeProjectile>();
+        EquipNothing();
+        _animator.SetTrigger("CastAttackSpell");
+        var fireballTransform = Instantiate(_fireballProjectilePrefab, _spellPoint.position, _spellPoint.rotation);
+        fireballTransform.parent = _spellPoint;
+        var fireball = fireballTransform.GetComponent<FireballProjectile>();
         var targetUnitGridPosition = e.targetGridPosition;
-        grenade.Setup(targetUnitGridPosition,
-            e.onHitAffectAction);
+        fireball.Setup(targetUnitGridPosition,
+            e.actionOnCastFinished);
     }
 
     private void MoveAction_OnStartMoving(object sender, EventArgs e)
@@ -95,7 +124,7 @@ public class UnitAnimator : MonoBehaviour
         _animator.SetBool("IsWalking", false);
     }
 
-    private void ShootAction_OnShoot(object sender, ShootAction.OnShootEventArgs e)
+    private void ShootAction_OnShoot(object sender, ShootAction.OnHostileBaseActionEventArgs e)
     {
         _animator.SetTrigger("Shoot");
         var bulletTransform = Instantiate(_bulletProjectilePrefab, _shootPointTransform.position, Quaternion.identity);
@@ -115,5 +144,11 @@ public class UnitAnimator : MonoBehaviour
     {
         _rifle.SetActive(false);
         _sword.SetActive(true);
+    }
+
+    private void EquipNothing()
+    {
+        _sword.SetActive(false);
+        _rifle.SetActive(false);
     }
 }
