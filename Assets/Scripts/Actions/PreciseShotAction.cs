@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PreciseShotAction : ShootAction
+public class PreciseShotAction : ArrowShotAction
 {
     public override string GetName() => "Precise Shot";
     public override string GetDescription() => "Attack enemy from distance using ATK. 50% to deal double damage";

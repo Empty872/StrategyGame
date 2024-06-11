@@ -8,10 +8,12 @@ public abstract class BaseAction : MonoBehaviour
 {
     public static event EventHandler OnAnyActionStarted;
     public static event EventHandler OnAnyActionCompleted;
+    public event EventHandler OnActionCompleted;
     public event EventHandler<OnFriendlyActionEventArgs> OnFriendlyActionStarted;
     public GridPosition TargetGridPosition { get; protected set; }
 
-    protected void StartFriendlyCastAction(BaseAction baseAction, GridPosition targetGridPosition, Action actionOnComplete)
+    protected void StartFriendlyCastAction(BaseAction baseAction, GridPosition targetGridPosition,
+        Action actionOnComplete)
     {
         OnFriendlyActionStarted?.Invoke(baseAction, new OnFriendlyActionEventArgs()
         {
@@ -116,6 +118,7 @@ public abstract class BaseAction : MonoBehaviour
         IsActive = false;
         OnActionComplete?.Invoke();
         TryUnselectAction();
+        OnActionCompleted?.Invoke(this, EventArgs.Empty);
         OnAnyActionCompleted?.Invoke(this, EventArgs.Empty);
     }
 

@@ -8,31 +8,41 @@ using UnityEngine.Serialization;
 public class UnitAnimator : MonoBehaviour
 {
     [SerializeField] private Animator _animator;
-    [SerializeField] private Transform _bulletProjectilePrefab;
+
+    [SerializeField] private Transform _arrowProjectilePrefab;
     [SerializeField] private Transform _fireballProjectilePrefab;
     [SerializeField] private Transform _iceBoltProjectilePrefab;
+
     [SerializeField] private Transform _shootPointTransform;
-    [SerializeField] private GameObject _rifle;
+
     [SerializeField] private GameObject _sword;
+    [SerializeField] private GameObject _bow;
+    [SerializeField] private GameObject _arrow;
     [SerializeField] private Transform _spellPoint;
     [SerializeField] private Transform _buffVfx;
     [SerializeField] private Transform _debuffVfx;
     [SerializeField] private Transform _healVfx;
+    private Unit _unit;
+    private static readonly int IsWalking = Animator.StringToHash("IsWalking");
+    private static readonly int IsAiming = Animator.StringToHash("IsAiming");
+    private static readonly int CastFriendlySpellTrigger = Animator.StringToHash("CastFriendlySpell");
+    private static readonly int CastAttackSpellTrigger = Animator.StringToHash("CastAttackSpell");
+    private static readonly int MeleeAttackTrigger = Animator.StringToHash("MeleeAttack");
 
 
     private void Awake()
     {
-        var unit = GetComponent<Unit>();
         if (TryGetComponent(out MoveAction moveAction))
         {
             moveAction.OnStartMoving += MoveAction_OnStartMoving;
             moveAction.OnStopMoving += MoveAction_OnStopMoving;
         }
 
-        var shootActions = GetComponents<ShootAction>();
-        foreach (var shootAction in shootActions)
+        var arrowShotActions = GetComponents<ArrowShotAction>();
+        foreach (var arrowShotAction in arrowShotActions)
         {
-            shootAction.OnShoot += ShootAction_OnShoot;
+            arrowShotAction.OnShot += ArrowShotAction_OnShot;
+            arrowShotAction.OnStartAiming += ArrowShotAction_OnStartAiming;
         }
 
         if (TryGetComponent(out FireballAction fireballAction))
@@ -58,9 +68,36 @@ public class UnitAnimator : MonoBehaviour
             swordAction.OnSwordActionStarted += SwordAction_OnSwordActionStarted;
         }
 
-        BaseAction.OnAnyActionCompleted += BaseAction_OnAnyActionCompleted;
-        unit.OnBuffObtained += Unit_OnBuffObtained;
-        unit.OnHealthRestored += Unit_OnHealthRestored;
+        _unit = GetComponent<Unit>();
+        _unit.OnActionCompleted += Unit_OnActionCompleted;
+        _unit.OnBuffObtained += Unit_OnBuffObtained;
+        _unit.OnHealthRestored += Unit_OnHealthRestored;
+    }
+    private void Start()
+    {
+        EquipBow();
+        HideArrow();
+    }
+
+    private void ArrowShotAction_OnShot(object sender, BaseAction.OnHostileBaseActionEventArgs e)
+    {
+        _animator.SetBool(IsAiming, false);
+        var arrowTransform = Instantiate(_arrowProjectilePrefab, _arrow.transform.position, _arrow.transform.rotation);
+        HideArrow();
+        var arrow = arrowTransform.GetComponent<ArrowProjectile>();
+        SetupProjectile(arrow, e.targetGridPosition, e.actionOnCastFinished);
+    }
+
+    private void ArrowShotAction_OnStartAiming(object sender, BaseAction.OnHostileBaseActionEventArgs e)
+    {
+        EquipBow();
+        _animator.SetBool(IsAiming, true);
+        ShowArrow();
+    }
+
+    private void Unit_OnActionCompleted(object sender, EventArgs e)
+    {
+        EquipBow();
     }
 
     private void Unit_OnHealthRestored(object sender, EventArgs e)
@@ -76,94 +113,84 @@ public class UnitAnimator : MonoBehaviour
         Instantiate(vfx, transform.position, vfx.rotation);
     }
 
-    private void BaseAction_OnAnyActionCompleted(object sender, EventArgs e)
-    {
-        EquipRifle();
-    }
-
     private void BaseAction_OnFriendlyActionStarted(object sender, BaseAction.OnFriendlyActionEventArgs e)
     {
         EquipNothing();
         var targetPosition = LevelGrid.Instance.GetWorldPosition(e.targetGridPosition);
         transform.LookAt(targetPosition);
-        _animator.SetTrigger("CastFriendlySpell");
+        _animator.SetTrigger(CastFriendlySpellTrigger);
         // e.actionOnCastFinished?.Invoke(e.targetGridPosition);
     }
 
     private void IceBoltAction_OnThrow(object sender, BaseAction.OnHostileBaseActionEventArgs e)
     {
-        EquipNothing();
-        var targetPosition = LevelGrid.Instance.GetWorldPosition(e.targetGridPosition);
-        transform.LookAt(targetPosition);
-        _animator.SetTrigger("CastAttackSpell");
-        var iceBoltTransform = Instantiate(_iceBoltProjectilePrefab, _spellPoint.position, _spellPoint.rotation);
-        iceBoltTransform.parent = _spellPoint;
-        var iceBolt = iceBoltTransform.GetComponent<AttackSpellProjectile>();
-        var targetUnitGridPosition = e.targetGridPosition;
-        iceBolt.Setup(targetUnitGridPosition,
-            e.actionOnCastFinished);
+        CastAttackSpell(_iceBoltProjectilePrefab, e);
     }
 
-    private void Start()
-    {
-        EquipRifle();
-    }
+    
 
     private void SwordAction_OnSwordActionStarted(object sender, EventArgs e)
     {
-        EquipSword();
-        _animator.SetTrigger("SwordSlash");
+        _animator.SetTrigger(MeleeAttackTrigger);
     }
 
     private void FireballAction_OnThrow(object sender, BaseAction.OnHostileBaseActionEventArgs e)
     {
+        CastAttackSpell(_fireballProjectilePrefab, e);
+    }
+
+    private void CastAttackSpell(Transform projectilePrefab, BaseAction.OnHostileBaseActionEventArgs e)
+    {
         EquipNothing();
-        _animator.SetTrigger("CastAttackSpell");
+        _animator.SetTrigger(CastAttackSpellTrigger);
         var targetPosition = LevelGrid.Instance.GetWorldPosition(e.targetGridPosition);
         transform.LookAt(targetPosition);
-        var fireballTransform = Instantiate(_fireballProjectilePrefab, _spellPoint.position, _spellPoint.rotation);
-        fireballTransform.parent = _spellPoint;
-        var fireball = fireballTransform.GetComponent<AttackSpellProjectile>();
-        var targetUnitGridPosition = e.targetGridPosition;
-        fireball.Setup(targetUnitGridPosition,
-            e.actionOnCastFinished);
+        var spellTransform = Instantiate(projectilePrefab, _spellPoint.position, _spellPoint.rotation);
+        var spellProjectile = spellTransform.GetComponent<AttackSpellProjectile>();
+        SetupProjectile(spellProjectile, e.targetGridPosition, e.actionOnCastFinished);
+    }
+
+    private void SetupProjectile(Projectile projectile, GridPosition targetGridPosition,
+        Action<GridPosition> onCastFinished)
+    {
+        projectile.Setup(targetGridPosition, onCastFinished);
     }
 
     private void MoveAction_OnStartMoving(object sender, EventArgs e)
     {
-        _animator.SetBool("IsWalking", true);
+        _animator.SetBool(IsWalking, true);
     }
 
     private void MoveAction_OnStopMoving(object sender, EventArgs e)
     {
-        _animator.SetBool("IsWalking", false);
+        _animator.SetBool(IsWalking, false);
     }
 
-    private void ShootAction_OnShoot(object sender, ShootAction.OnHostileBaseActionEventArgs e)
-    {
-        _animator.SetTrigger("Shoot");
-        var bulletTransform = Instantiate(_bulletProjectilePrefab, _shootPointTransform.position, Quaternion.identity);
-        var bullet = bulletTransform.GetComponent<BulletProjectile>();
-        var targetUnitPosition = e.targetUnit.WorldPosition;
-        targetUnitPosition.y = _shootPointTransform.position.y;
-        bullet.Setup(targetUnitPosition);
-    }
-
-    private void EquipRifle()
+    private void EquipBow()
     {
         _sword.SetActive(false);
-        _rifle.SetActive(true);
+        _bow.SetActive(true);
     }
 
     private void EquipSword()
     {
-        _rifle.SetActive(false);
+        _bow.SetActive(false);
         _sword.SetActive(true);
     }
 
     private void EquipNothing()
     {
         _sword.SetActive(false);
-        _rifle.SetActive(false);
+        _bow.SetActive(false);
+    }
+
+    private void ShowArrow()
+    {
+        _arrow.SetActive(true);
+    }
+
+    private void HideArrow()
+    {
+        _arrow.SetActive(false);
     }
 }

@@ -50,11 +50,11 @@ public class AmbushAction : BaseAction
 
     private void EnhanceShootAction()
     {
-        GetComponent<ShootAction>().EnhanceAttack();
+        GetComponent<ArrowShotAction>().EnhanceAttack();
     }
 
     private void DisEnhanceShootAction()
     {
-        GetComponent<ShootAction>().DisEnhanceAttack();
+        GetComponent<ArrowShotAction>().DisEnhanceAttack();
     }
 }

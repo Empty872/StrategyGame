@@ -4,18 +4,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-public class AttackSpellProjectile : MonoBehaviour
+public class AttackSpellProjectile : Projectile
 {
-    private Vector3 _targetPosition;
-    private GridPosition _targetGridPosition;
-
-    [SerializeField] private Transform _hitVfxPrefab;
-    private Action<GridPosition> _onHitAffectAction;
-    private float _timerToMove = 1;
+    private float _timerToMove = 1f;
     private bool _inArms = true;
-    private float _moveSpeed = 15f;
-    private float _reachedTargetDistance = 0.2f;
-    private float _targetPositionY = 1;
+    protected override float GetSpeed() => 15f;
+
+    private void Start()
+    {
+        SetHitPoint(transform);
+    }
 
 
     private void Update()
@@ -33,23 +31,6 @@ public class AttackSpellProjectile : MonoBehaviour
             _inArms = false;
         }
 
-        Vector3 moveDir = (_targetPosition - transform.position).normalized;
-        transform.position += moveDir * _moveSpeed * Time.deltaTime;
-        transform.LookAt(_targetPosition);
-        if (Vector3.Distance(transform.position, _targetPosition) < _reachedTargetDistance)
-        {
-            Instantiate(_hitVfxPrefab, _targetPosition, Quaternion.identity);
-            _onHitAffectAction.Invoke(_targetGridPosition);
-            Destroy(gameObject);
-        }
-    }
-
-
-    public void Setup(GridPosition targetGridPosition,
-        Action<GridPosition> onHitAffectAction)
-    {
-        _targetPosition = LevelGrid.Instance.GetWorldPosition(targetGridPosition) + Vector3.up * _targetPositionY;
-        _targetGridPosition = targetGridPosition;
-        _onHitAffectAction = onHitAffectAction;
+        Move();
     }
 }
