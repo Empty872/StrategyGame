@@ -14,8 +14,9 @@ public class SwordAction : BaseAction
     protected override ActionRangeType GetActionRangeType() => ActionRangeType.Square;
     protected override bool CanBeUsedOnAllies() => false;
     protected override bool CanBeUsedOnEnemies() => true;
-    private float _beforeHitTime = 0.7f;
-    private float _afterHitTime = 0.5f;
+    private float _beforeHitTimeSword = 0.7f;
+    private float _beforeHitTimeFist = 1.12f;
+    private float _afterHitTime = 0.7f;
     private float _rotationSpeed = 10f;
     private float _stateTimer;
     private State _state;
@@ -52,6 +53,7 @@ public class SwordAction : BaseAction
             NextState();
         }
     }
+
     private void RotateTowardsTarget()
     {
         var attackDirection = (TargetUnit.WorldPosition - transform.position).normalized;
@@ -81,7 +83,7 @@ public class SwordAction : BaseAction
     {
         TargetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
         _state = State.SwingingBeforeHit;
-        _stateTimer = _beforeHitTime;
+        _stateTimer = Unit.UnitClass is UnitClass.Warrior ? _beforeHitTimeSword : _beforeHitTimeFist;
         TargetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
         OnSwordActionStarted?.Invoke(this, EventArgs.Empty);
         StartAction(actionOnComplete);

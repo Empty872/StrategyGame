@@ -18,9 +18,12 @@ public class Unit : MonoBehaviour
 
     public int ActionPoints { get; private set; }
     public int MovementPoints { get; private set; }
+    [SerializeField] private UnitClass _unitClass;
+    public UnitClass UnitClass => _unitClass;
     public List<Buff> BuffList => _buffSystem.BuffList;
 
     // public int ActionPoints { get; private set; }
+    public event EventHandler OnActionCompleted;
     public static event EventHandler OnAnyActionPointsChanged;
     public static event EventHandler<UnitGridPositionEventArgs> OnAnyUnitDied;
     public static event EventHandler OnAnyUnitSpawned;
@@ -53,9 +56,19 @@ public class Unit : MonoBehaviour
     private void Awake()
     {
         ActionArray = GetComponents<BaseAction>();
+        foreach (var action in ActionArray)
+        {
+            action.OnActionCompleted += Action_OnActionCompleted;
+        }
+
         _healthSystem = GetComponent<HealthSystem>();
         _unitCharacteristic = GetComponent<UnitCharacteristic>();
         _buffSystem = GetComponent<BuffSystem>();
+    }
+
+    private void Action_OnActionCompleted(object sender, EventArgs e)
+    {
+        OnActionCompleted?.Invoke(this, EventArgs.Empty);
     }
 
     private void Start()

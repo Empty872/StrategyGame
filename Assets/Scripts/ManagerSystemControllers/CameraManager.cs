@@ -18,7 +18,7 @@ public class CameraManager : MonoBehaviour
     {
         switch (sender)
         {
-            case ShootAction shootAction:
+            case ArrowShotAction shootAction:
                 HideActionCamera();
                 break;
         }
@@ -28,7 +28,7 @@ public class CameraManager : MonoBehaviour
     {
         switch (sender)
         {
-            case ShootAction shootAction:
+            case ArrowShotAction shootAction:
                 var shooterUnitPosition = shootAction.Unit.WorldPosition;
                 var targetUnitPosition = shootAction.TargetUnit.WorldPosition;
                 var yOffsetVector = Vector3.up * 1.7f;
@@ -48,11 +48,11 @@ public class CameraManager : MonoBehaviour
     // Start is called before the first frame update
     private void ShowActionCamera()
     {
-        _actionCamera.SetActive(true);
+        // _actionCamera.SetActive(true);
     }
 
     private void HideActionCamera()
     {
-        _actionCamera.SetActive(false);
+        // _actionCamera.SetActive(false);
     }
 }

@@ -9684,5 +9684,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59b0bcb19a4c283409a5373bf1cbe68a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _hitPoint: {fileID: 7276033599785305660}
+  _trail: {fileID: 0}
   _hitVfxPrefab: {fileID: 3108613952624452008, guid: 9a218edacac2d264389c84c30c6fea85,
     type: 3}
