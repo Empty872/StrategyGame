@@ -16,6 +16,7 @@ public class UnitAnimator : MonoBehaviour
     [SerializeField] private Transform _shootPointTransform;
 
     [SerializeField] private GameObject _sword;
+    [SerializeField] private GameObject _swordTrail;
     [SerializeField] private GameObject _bow;
     [SerializeField] private GameObject _arrow;
     [SerializeField] private Transform _spellPoint;
@@ -73,10 +74,12 @@ public class UnitAnimator : MonoBehaviour
         _unit.OnBuffObtained += Unit_OnBuffObtained;
         _unit.OnHealthRestored += Unit_OnHealthRestored;
     }
+
     private void Start()
     {
-        EquipBow();
+        EquipDefault();
         HideArrow();
+        _swordTrail.SetActive(false);
     }
 
     private void ArrowShotAction_OnShot(object sender, BaseAction.OnHostileBaseActionEventArgs e)
@@ -90,6 +93,7 @@ public class UnitAnimator : MonoBehaviour
 
     private void ArrowShotAction_OnStartAiming(object sender, BaseAction.OnHostileBaseActionEventArgs e)
     {
+        EquipNothing();
         EquipBow();
         _animator.SetBool(IsAiming, true);
         ShowArrow();
@@ -97,7 +101,8 @@ public class UnitAnimator : MonoBehaviour
 
     private void Unit_OnActionCompleted(object sender, EventArgs e)
     {
-        EquipBow();
+        EquipDefault();
+        _swordTrail.SetActive(false);
     }
 
     private void Unit_OnHealthRestored(object sender, EventArgs e)
@@ -127,11 +132,13 @@ public class UnitAnimator : MonoBehaviour
         CastAttackSpell(_iceBoltProjectilePrefab, e);
     }
 
-    
 
     private void SwordAction_OnSwordActionStarted(object sender, EventArgs e)
     {
         _animator.SetTrigger(MeleeAttackTrigger);
+        EquipNothing();
+        EquipSword();
+        _swordTrail.SetActive(true);
     }
 
     private void FireballAction_OnThrow(object sender, BaseAction.OnHostileBaseActionEventArgs e)
@@ -168,13 +175,11 @@ public class UnitAnimator : MonoBehaviour
 
     private void EquipBow()
     {
-        _sword.SetActive(false);
         _bow.SetActive(true);
     }
 
     private void EquipSword()
     {
-        _bow.SetActive(false);
         _sword.SetActive(true);
     }
 
@@ -192,5 +197,21 @@ public class UnitAnimator : MonoBehaviour
     private void HideArrow()
     {
         _arrow.SetActive(false);
+    }
+
+    private void EquipDefault()
+    {
+        EquipNothing();
+        switch (_unit.UnitClass)
+        {
+            case UnitClass.Warrior:
+                EquipSword();
+                break;
+            case UnitClass.Archer:
+                EquipBow();
+                break;
+            default:
+                break;
+        }
     }
 }

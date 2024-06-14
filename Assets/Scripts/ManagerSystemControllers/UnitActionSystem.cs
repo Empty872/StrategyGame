@@ -55,6 +55,7 @@ public class UnitActionSystem : MonoBehaviour
         if (InputManager.Instance.IsLeftMouseButtonDownThisFrame())
         {
             var mouseGridPosition = LevelGrid.Instance.GetGridPosition(MouseWorld.GetPosition());
+            if (_selectedUnit.IsEnemy) return;
             if (!SelectedAction.IsValidActionGridPosition(mouseGridPosition)) return;
             if (!_selectedUnit.TrySpendActionPointsToTakeAction(SelectedAction)) return;
             SetBusy();
@@ -72,7 +73,7 @@ public class UnitActionSystem : MonoBehaviour
             if (raycastHit.transform.TryGetComponent(out Unit unit))
             {
                 if (_selectedUnit == unit) return false;
-                if (unit.IsEnemy) return false;
+                // if (unit.IsEnemy) return false;
                 SelectUnit(unit);
                 return true;
             }
