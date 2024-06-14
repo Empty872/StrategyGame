@@ -63,7 +63,7 @@ public class VolleyAction : BaseAction
         };
     }
 
-    public override int GetCooldown() => 2;
+    public override int GetCooldown() => 3;
 
     public override GridColorEnum GetColor() => GridColorEnum.Red;
 

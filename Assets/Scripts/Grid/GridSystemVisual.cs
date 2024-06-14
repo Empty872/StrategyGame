@@ -118,6 +118,7 @@ public class GridSystemVisual : MonoBehaviour
         HideAllGridPositions();
         if (UnitActionSystem.Instance.IsBusy) return;
         if (!TurnSystem.Instance.IsPlayerTurn) return;
+        if (UnitActionSystem.Instance.SelectedUnit.IsEnemy) return;
         var selectedAction = UnitActionSystem.Instance.SelectedAction;
         if (selectedAction is not null) ShowReachableGridPositions(selectedAction.GetReachableActionGridPositionList());
     }
@@ -127,6 +128,7 @@ public class GridSystemVisual : MonoBehaviour
         if (EventSystem.current.IsPointerOverGameObject()) return;
         if (UnitActionSystem.Instance.IsBusy) return;
         if (!TurnSystem.Instance.IsPlayerTurn) return;
+        if (UnitActionSystem.Instance.SelectedUnit.IsEnemy) return;
         var mouseGridPosition = LevelGrid.Instance.GetGridPosition(MouseWorld.GetPosition());
         var selectedAction = UnitActionSystem.Instance.SelectedAction;
         var mouseGridPositionList = new List<GridPosition>();

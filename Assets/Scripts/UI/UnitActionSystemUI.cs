@@ -32,8 +32,15 @@ public class UnitActionSystemUI : MonoBehaviour
 
     private void UnitActionSystem_OnSelectedUnitChanged(object sender, EventArgs e)
     {
-        if (UnitActionSystem.Instance.SelectedUnit.IsEnemy) return;
-        CreateUnitActionButtons();
+        if (UnitActionSystem.Instance.SelectedUnit.IsEnemy)
+        {
+            ClearUnitActionButtons();
+        }
+        else
+        {
+            CreateUnitActionButtons();
+        }
+
         UpdateVisual();
         UpdateActionPoints();
     }
@@ -45,14 +52,10 @@ public class UnitActionSystemUI : MonoBehaviour
 
     private void CreateUnitActionButtons()
     {
-        foreach (Transform actionButton in _actionButtonContainer)
-        {
-            Destroy(actionButton.gameObject);
-        }
-
-        _actionButtonUIList.Clear();
+        ClearUnitActionButtons();
 
         var selectedUnit = UnitActionSystem.Instance.SelectedUnit;
+        if (selectedUnit.IsEnemy) return;
         foreach (var action in selectedUnit.ActionArray)
         {
             var actionButtonTransform = Instantiate(_actionButtonPrefab, _actionButtonContainer);
@@ -60,6 +63,16 @@ public class UnitActionSystemUI : MonoBehaviour
             actionButtonUI.SetAction(action);
             _actionButtonUIList.Add(actionButtonUI);
         }
+    }
+
+    private void ClearUnitActionButtons()
+    {
+        foreach (Transform actionButton in _actionButtonContainer)
+        {
+            Destroy(actionButton.gameObject);
+        }
+
+        _actionButtonUIList.Clear();
     }
 
     private void UpdateVisual()
@@ -72,7 +85,12 @@ public class UnitActionSystemUI : MonoBehaviour
 
     private void UpdateActionPoints()
     {
-        _actionPointsText.text = "Action Points: " + UnitActionSystem.Instance.SelectedUnit.ActionPoints;
+        if (UnitActionSystem.Instance.SelectedUnit.IsEnemy) _actionPointsText.enabled = false;
+        else
+        {
+            _actionPointsText.text = "Action Points: " + UnitActionSystem.Instance.SelectedUnit.ActionPoints;
+            _actionPointsText.enabled = true;
+        }
     }
 
     // private void TurnSystem_OnTurnChanged(object sender, EventArgs e)

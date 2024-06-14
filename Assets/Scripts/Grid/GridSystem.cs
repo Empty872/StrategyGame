@@ -37,21 +37,6 @@ public class GridSystem<TGridObject>
         return new GridPosition(Mathf.RoundToInt(worldPosition.x / CellSize),
             Mathf.RoundToInt(worldPosition.z / CellSize));
     }
-
-    public void CreateDebugObjects(Transform debugPrefab)
-    {
-        for (int x = 0; x < Width; x++)
-        {
-            for (int z = 0; z < Height; z++)
-            {
-                var gridPosition = new GridPosition(x, z);
-                var debugTransform =
-                    GameObject.Instantiate(debugPrefab, GetWorldPosition(gridPosition), Quaternion.identity);
-                var gridDebugObject = debugTransform.GetComponent<GridDebugObject>();
-                gridDebugObject.SetGridObject(GetGridObject(gridPosition));
-            }
-        }
-    }
     
 
     public TGridObject GetGridObject(GridPosition gridPosition)

@@ -12,6 +12,7 @@ public class ChargeAction : BaseAction
     protected override bool CanBeUsedOnEnemies() => true;
     public override string GetDescription() => "Move Unit";
     public override int GetCooldown() => 3;
+    protected override float GetModifier() => 1.2f;
     protected override ActionRangeType GetActionRangeType() => ActionRangeType.VerticalHorizontal;
     private GridPosition _targetGridPosition;
     private Vector3 _pathEndPosition;
