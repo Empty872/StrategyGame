@@ -36,7 +36,6 @@ public abstract class Projectile : MonoBehaviour
         {
             if (_trail != null)
             {
-                Debug.Log(_trail);
                 _trail.parent = null;
             };
             Instantiate(_hitVfxPrefab, _targetPosition, Quaternion.identity);

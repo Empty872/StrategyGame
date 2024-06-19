@@ -26,6 +26,7 @@ public class Unit : MonoBehaviour
     public event EventHandler OnActionCompleted;
     public static event EventHandler OnAnyActionPointsChanged;
     public static event EventHandler<UnitGridPositionEventArgs> OnAnyUnitDied;
+    public event EventHandler<UnitGridPositionEventArgs> OnUnitDied;
     public static event EventHandler OnAnyUnitSpawned;
     public event EventHandler OnHealthRestored;
     public event EventHandler<BuffEventArgs> OnBuffObtained;
@@ -156,6 +157,7 @@ public class Unit : MonoBehaviour
         LevelGrid.Instance.RemoveUnitAtGridPosition(GridPosition, this);
         Destroy(gameObject);
         OnAnyUnitDied?.Invoke(this, new UnitGridPositionEventArgs { gridPosition = GridPosition });
+        OnUnitDied?.Invoke(this, new UnitGridPositionEventArgs { gridPosition = GridPosition });
     }
 
     public float GetHealthNormalized() => _healthSystem.GetHealthNormalized();

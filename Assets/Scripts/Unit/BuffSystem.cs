@@ -17,6 +17,12 @@ public class BuffSystem : MonoBehaviour
     private void Start()
     {
         TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
+        _unit.OnUnitDied += Unit_OnUnitDied;
+    }
+
+    private void Unit_OnUnitDied(object sender, Unit.UnitGridPositionEventArgs e)
+    {
+        ClearBuffList();
     }
 
     private void TurnSystem_OnTurnChanged(object sender, TurnSystem.OnTurnChangedEventArgs e)
@@ -57,5 +63,10 @@ public class BuffSystem : MonoBehaviour
         if (buff.CharacteristicType is not CharacteristicType.Null)
             _unit.ChangeCharacteristic(buff.CharacteristicType, -buff.Value);
         buff.OnRemoveAction?.Invoke();
+    }
+
+    private void ClearBuffList()
+    {
+        BuffList.Clear();
     }
 }

@@ -37,15 +37,6 @@ public class FortifyAction : BaseAction
             "Defence increased by " + _extraDefense));
     }
 
-    public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
-    {
-        return new EnemyAIAction
-        {
-            gridPosition = gridPosition,
-            actionPriority = 0
-        };
-    }
-
     public override GridColorEnum GetColor() => GridColorEnum.Green;
 
     public override string GetDescription() =>

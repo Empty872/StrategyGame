@@ -43,14 +43,6 @@ public class BattleCryAction : BaseAction
             "Attack increased by " + _extraAttack));
     }
 
-    public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
-    {
-        return new EnemyAIAction
-        {
-            gridPosition = gridPosition,
-            actionPriority = 0
-        };
-    }
 
     public override GridColorEnum GetColor() => GridColorEnum.Green;
     protected override int GetActionRange() => 1;

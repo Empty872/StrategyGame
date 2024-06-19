@@ -34,16 +34,6 @@ public class PrayerAction : BaseAction
         StartFriendlyCastAction(this, gridPosition, actionOnComplete);
     }
 
-
-    public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
-    {
-        return new EnemyAIAction
-        {
-            gridPosition = gridPosition,
-            actionPriority = 0
-        };
-    }
-
     public override GridColorEnum GetColor() => GridColorEnum.Green;
 
     public override string GetDescription() =>

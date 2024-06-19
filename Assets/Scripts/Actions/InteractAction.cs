@@ -27,11 +27,6 @@ public class InteractAction : BaseAction
 
     public override string GetName() => "Interact";
 
-    public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
-    {
-        return new EnemyAIAction { gridPosition = gridPosition, actionPriority = 0 };
-    }
-
     public override GridColorEnum GetColor() => GridColorEnum.Yellow;
     public override int GetActionPointsCost() => 0;
     public override string GetDescription() => "Interact with object";

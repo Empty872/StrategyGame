@@ -9,6 +9,8 @@ public class UnitManager : MonoBehaviour
     private List<Unit> _unitList = new();
     private List<Unit> _friendlyUnitList = new();
     private List<Unit> _enemyUnitList = new();
+    public event EventHandler OnAllFriendlyUnitsDied;
+    public event EventHandler OnAllEnemiesDied;
     public List<Unit> UnitList => _unitList;
     public List<Unit> FriendlyUnitList => _friendlyUnitList;
     public List<Unit> EnemyUnitList => _enemyUnitList;
@@ -44,5 +46,7 @@ public class UnitManager : MonoBehaviour
         _unitList.Remove(unit);
         if (unit.IsEnemy) _enemyUnitList.Remove(unit);
         else _friendlyUnitList.Remove(unit);
+        if (EnemyUnitList.Count == 0) OnAllEnemiesDied?.Invoke(this, EventArgs.Empty);
+        if (UnitList.Count == 0) OnAllFriendlyUnitsDied?.Invoke(this, EventArgs.Empty);
     }
 }

@@ -53,16 +53,6 @@ public class VolleyAction : BaseAction
             unit.TakeDamage(GetFinalDamage(Unit.Attack, unit.Defense));
     }
 
-    public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
-    {
-        // var targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
-        return new EnemyAIAction
-        {
-            gridPosition = gridPosition,
-            actionPriority = 0
-        };
-    }
-
     public override int GetCooldown() => 3;
 
     public override GridColorEnum GetColor() => GridColorEnum.Red;
