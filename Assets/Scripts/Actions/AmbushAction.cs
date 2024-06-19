@@ -31,15 +31,6 @@ public class AmbushAction : BaseAction
         StartFriendlyCastAction(this, gridPosition, actionOnComplete);
     }
 
-    public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
-    {
-        return new EnemyAIAction
-        {
-            gridPosition = gridPosition,
-            actionPriority = 0
-        };
-    }
-
 
     public override GridColorEnum GetColor() => GridColorEnum.Green;
 
@@ -55,6 +46,8 @@ public class AmbushAction : BaseAction
 
     private void DisEnhanceShootAction()
     {
-        GetComponent<ArrowShotAction>().DisEnhanceAttack();
+        Debug.Log(GetComponent<ArrowShotAction>());
+        var arrowShotAction = GetComponent<ArrowShotAction>();
+        if (arrowShotAction != null) arrowShotAction.DisEnhanceAttack();
     }
 }

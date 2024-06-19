@@ -66,15 +66,6 @@ public class IceBoltAction : BaseAction
         }
     }
 
-    public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
-    {
-        return new EnemyAIAction
-        {
-            gridPosition = gridPosition,
-            actionPriority = 0
-        };
-    }
-
     public override int GetCooldown() => 2;
 
     public override GridColorEnum GetColor() => GridColorEnum.Red;

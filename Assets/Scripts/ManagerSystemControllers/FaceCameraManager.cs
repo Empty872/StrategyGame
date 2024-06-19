@@ -12,6 +12,7 @@ public class FaceCameraManager : MonoBehaviour
         UnitActionSystem.Instance.OnSelectedUnitChanged += UnitActionSystem_OnSelectedUnitChanged;
         TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
         _currentUnit = UnitActionSystem.Instance.SelectedUnit;
+        SwitchCamera(UnitActionSystem.Instance.SelectedUnit);
     }
 
     private void TurnSystem_OnTurnChanged(object sender, TurnSystem.OnTurnChangedEventArgs e)

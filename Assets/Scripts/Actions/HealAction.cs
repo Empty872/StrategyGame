@@ -43,14 +43,6 @@ public class HealAction : BaseAction
         TargetUnit.RestoreHealth(HealAmount);
     }
 
-    public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
-    {
-        return new EnemyAIAction
-        {
-            gridPosition = gridPosition,
-            actionPriority = 0
-        };
-    }
 
     public override GridColorEnum GetColor() => GridColorEnum.Green;
     public override string GetDescription() => "Heal one ally by " + HealAmount + " HP";

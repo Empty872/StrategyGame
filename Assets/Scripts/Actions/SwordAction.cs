@@ -95,16 +95,8 @@ public class SwordAction : BaseAction
         OnAnyAttack?.Invoke(this, EventArgs.Empty);
     }
 
-    public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
-    {
-        return new EnemyAIAction
-        {
-            gridPosition = gridPosition,
-            actionPriority = 1000
-        };
-    }
-
     public override GridColorEnum GetColor() => GridColorEnum.Red;
     protected override float GetModifier() => 1;
     public override string GetDescription() => "Attack enemy in melee combat using ATK";
+
 }

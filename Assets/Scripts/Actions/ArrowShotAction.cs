@@ -113,16 +113,6 @@ public class ArrowShotAction : BaseAction
         // OnAnyShoot?.Invoke(this, new OnHostileBaseActionEventArgs { targetUnit = TargetUnit, unit = Unit });
     }
 
-    public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
-    {
-        var targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
-        return new EnemyAIAction
-        {
-            gridPosition = gridPosition,
-            actionPriority = 100 + (1 - targetUnit.GetHealthNormalized()) * 100
-        };
-    }
-
     public override GridColorEnum GetColor() => GridColorEnum.Red;
     public override string GetDescription() => "Attack enemy from distance using ATK";
     protected override float GetModifier() => _enhanсedModifier;

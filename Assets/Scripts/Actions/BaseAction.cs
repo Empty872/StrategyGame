@@ -145,6 +145,7 @@ public abstract class BaseAction : MonoBehaviour
 
     protected virtual void PerformAction(GridPosition targetGridPosition)
     {
+        Debug.Log(GetName());
         var gridPositionList = GetAffectedGridPositionList(targetGridPosition);
         foreach (var gridPosition in gridPositionList)
         {
@@ -238,7 +239,15 @@ public abstract class BaseAction : MonoBehaviour
         return enemyAIActionList[0];
     }
 
-    public abstract EnemyAIAction GetEnemyAIAction(GridPosition gridPosition);
+    // public abstract EnemyAIAction GetEnemyAIAction(GridPosition gridPosition);
+    public EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
+    {
+        return new EnemyAIAction
+        {
+            gridPosition = gridPosition,
+            actionPriority = GetPriority(gridPosition)
+        };
+    }
 
     private void ReduceCurrentCooldown()
     {
@@ -279,4 +288,19 @@ public abstract class BaseAction : MonoBehaviour
     protected virtual bool CanBeUsedOnInteractableObjects() => false;
 
     public abstract string GetDescription();
+
+    protected virtual float GetPriority(GridPosition gridPosition)
+    {
+        var affectedGridPositionList = GetAffectedGridPositionList(gridPosition);
+        var damage = 0;
+        foreach (var affectedGridPosition in affectedGridPositionList)
+        {
+            var targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(affectedGridPosition);
+            if (targetUnit is not null)
+                damage += GetFinalDamage(Unit.Attack, targetUnit.Defense);
+        }
+
+        var priority = damage / (GridPosition.GetDistance(Unit.GridPosition, gridPosition) + 0.00001F);
+        return priority;
+    }
 }

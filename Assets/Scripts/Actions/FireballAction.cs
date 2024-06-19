@@ -75,16 +75,6 @@ public class FireballAction : BaseAction
         if (desctructible is not null) desctructible.Destruct();
     }
 
-    public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
-    {
-        // var targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
-        return new EnemyAIAction
-        {
-            gridPosition = gridPosition,
-            actionPriority = 0
-        };
-    }
-
     public override int GetCooldown() => 2;
 
     public override GridColorEnum GetColor() => GridColorEnum.Red;

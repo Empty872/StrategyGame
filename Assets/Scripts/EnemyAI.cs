@@ -36,9 +36,15 @@ public class EnemyAI : MonoBehaviour
 
     private void TurnSystem_OnTurnChanged(object sender, TurnSystem.OnTurnChangedEventArgs e)
     {
-        if (e.isPlayerTurn) return;
-        _state = State.TakingTurn;
-        _timer = 2;
+        if (e.isPlayerTurn)
+        {
+            _state = State.WaitingForEnemyTurn;
+        }
+        else
+        {
+            _state = State.TakingTurn;
+            _timer = 2;
+        }
     }
 
     // Update is called once per frame
@@ -86,6 +92,7 @@ public class EnemyAI : MonoBehaviour
         BaseAction bestAction = null;
         foreach (var action in enemyUnit.ActionArray)
         {
+            if (!action.CanBeUsed()) continue;
             if (!enemyUnit.CanSpendActionPointsToTakeAction(action)) continue;
             if (bestEnemyAIAction is null)
             {

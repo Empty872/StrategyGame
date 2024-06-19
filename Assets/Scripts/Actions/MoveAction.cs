@@ -109,9 +109,4 @@ public class MoveAction : BaseAction
     }
 
     public override string GetName() => "Move";
-
-    public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
-    {
-        return new EnemyAIAction { gridPosition = gridPosition, actionPriority = 10 };
-    }
 }
