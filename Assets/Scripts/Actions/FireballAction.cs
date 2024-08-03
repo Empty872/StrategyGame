@@ -81,4 +81,5 @@ public class FireballAction : BaseAction
 
     // protected override float GetModifier() => 0.6f;
     public override string GetDescription() => "Deal MAG to all units in range";
+    protected override bool IsMagic() => true;
 }

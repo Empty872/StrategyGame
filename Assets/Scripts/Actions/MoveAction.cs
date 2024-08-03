@@ -1,7 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class MoveAction : BaseAction
 {
@@ -109,4 +109,12 @@ public class MoveAction : BaseAction
     }
 
     public override string GetName() => "Move";
+
+    protected override float GetPriority(GridPosition gridPosition)
+    {
+        var randomEnemyGridPosition =
+            UnitManager.Instance.FriendlyUnitList[Random.Range(0, UnitManager.Instance.FriendlyUnitList.Count)]
+                .GridPosition;
+        return 1f / Pathfinding.Instance.FindPath(randomEnemyGridPosition, gridPosition, out int pathLength).Count;
+    }
 }

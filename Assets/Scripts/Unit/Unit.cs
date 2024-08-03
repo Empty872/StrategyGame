@@ -4,8 +4,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
+// [Serializable]
 public class Unit : MonoBehaviour
 {
+    [SerializeField] private string _name;
+    public string Name => _name;
     [SerializeField] private GameObject _faceCamera;
     public GameObject FaceCamera => _faceCamera;
     public GridPosition GridPosition { get; private set; }

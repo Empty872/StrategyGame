@@ -50,4 +50,6 @@ public class AmbushAction : BaseAction
         var arrowShotAction = GetComponent<ArrowShotAction>();
         if (arrowShotAction != null) arrowShotAction.DisEnhanceAttack();
     }
+
+    protected override float GetBuffesPriority(GridPosition gridPosition) => 5;
 }

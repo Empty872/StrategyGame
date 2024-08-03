@@ -55,4 +55,6 @@ public class BattleCryAction : BaseAction
 
     public override string GetDescription() =>
         "Increases allies' ATK by " + _extraAttack + " for " + _effectDuration + " turns";
+    
+    protected override float GetBuffesPriority(GridPosition gridPosition) => 25;
 }

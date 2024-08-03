@@ -70,4 +70,6 @@ public class IceBoltAction : BaseAction
 
     public override GridColorEnum GetColor() => GridColorEnum.Red;
     public override string GetDescription() => "Deal MAG and slow down enemy";
+    protected override bool IsMagic() => true;
+    protected override float GetBuffesPriority(GridPosition gridPosition) => 5;
 }

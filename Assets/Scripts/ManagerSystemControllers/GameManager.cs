@@ -7,6 +7,20 @@ public class GameManager : MonoBehaviour
 {
     [SerializeField] private GameObject _gameDefeatUI;
     [SerializeField] private GameObject _gameWinUI;
+    public Action OnWin;
+    public Action OnDefeat;
+    public static GameManager Instance;
+
+    private void Awake()
+    {
+        if (Instance is not null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+    }
 
     private void Start()
     {
@@ -24,13 +38,17 @@ public class GameManager : MonoBehaviour
         Win();
     }
 
-    private void Defeat()
+    public void Defeat()
     {
         _gameDefeatUI.SetActive(true);
+        OnDefeat.Invoke();
+        Time.timeScale = 0;
     }
 
-    private void Win()
+    public void Win()
     {
         _gameWinUI.SetActive(true);
+        OnWin.Invoke();
+        Time.timeScale = 0;
     }
 }

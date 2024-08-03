@@ -6,6 +6,7 @@ using UnityEngine;
 
 public abstract class BaseAction : MonoBehaviour
 {
+    public static event Action<Unit, string> OnAnyActionStartedDescription;
     public static event EventHandler OnAnyActionStarted;
     public static event EventHandler OnAnyActionCompleted;
     public event EventHandler OnActionCompleted;
@@ -111,6 +112,7 @@ public abstract class BaseAction : MonoBehaviour
         OnActionComplete = action;
         ActivateCooldown();
         OnAnyActionStarted?.Invoke(this, EventArgs.Empty);
+        OnAnyActionStartedDescription?.Invoke(Unit, GetName());
     }
 
     protected void CompleteAction()
@@ -292,15 +294,32 @@ public abstract class BaseAction : MonoBehaviour
     protected virtual float GetPriority(GridPosition gridPosition)
     {
         var affectedGridPositionList = GetAffectedGridPositionList(gridPosition);
+        var heal = GetHealPriority(gridPosition);
+        var damage = GetDamagePriority(gridPosition);
+        var buffes = GetBuffesPriority(gridPosition);
+
+        var priority = damage + heal + buffes;
+        return priority;
+    }
+
+    protected float GetDamagePriority(GridPosition gridPosition)
+    {
+        var affectedGridPositionList = GetAffectedGridPositionList(gridPosition);
         var damage = 0;
         foreach (var affectedGridPosition in affectedGridPositionList)
         {
             var targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(affectedGridPosition);
-            if (targetUnit is not null)
-                damage += GetFinalDamage(Unit.Attack, targetUnit.Defense);
+            if (targetUnit is null) continue;
+            var finalDamage = GetFinalDamage(IsMagic() ? Unit.MagicAttack : Unit.Attack, targetUnit.Defense);
+            if (!targetUnit.IsEnemy)
+                damage += finalDamage;
+            else damage -= finalDamage;
         }
 
-        var priority = damage / (GridPosition.GetDistance(Unit.GridPosition, gridPosition) + 0.00001F);
-        return priority;
+        return damage;
     }
+
+    protected virtual bool IsMagic() => false;
+    protected virtual float GetHealPriority(GridPosition gridPosition) => 0;
+    protected virtual float GetBuffesPriority(GridPosition gridPosition) => 0;
 }

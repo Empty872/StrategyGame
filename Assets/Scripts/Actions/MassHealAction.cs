@@ -53,4 +53,19 @@ public class MassHealAction : BaseAction
 
     public override string GetDescription() =>
         "Heal allies by " + HealAmount + " HP";
+    
+    protected override float GetHealPriority(GridPosition gridPosition)
+    {
+        var affectedGridPositionList = GetAffectedGridPositionList(gridPosition);
+        var heal = 0;
+        foreach (var affectedGridPosition in affectedGridPositionList)
+        {
+            var targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(affectedGridPosition);
+            if (targetUnit is null) continue;
+            if (targetUnit.IsEnemy)
+                heal += Mathf.Min(targetUnit.MaxHealth- targetUnit.Health, HealAmount);
+        }
+
+        return heal;
+    }
 }
